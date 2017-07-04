@@ -2,7 +2,7 @@ Introductory Chapter
 ================
 Chad Evans
 
-Built with 3.3.2. Last run on 2017-07-03.
+Built with 3.3.2. Last run on 2017-07-04.
 
 -   [Configure](#config)
     -   Libraries
@@ -31,8 +31,6 @@ cleanedDatasets<-c("facdata.Rdata", "AFTtable.Rdata","expensedata.RData","IPEDS_
 for(i in cleanedDatasets){
   load(file.path(cache, i))
 }
-NCESenroll<-read_csv(file.path(Data, "NCES_actual_enrollment.csv"))
-NCESproject<-read_csv(file.path(Data, "NCES_projected_enrollment.csv"))
 load(file.path(Private_Cache,"Cleaned_HERI.RData"))
 ```
 
@@ -107,18 +105,15 @@ The Rising Cost of Higher Education.
 To understand the rising costs of higher education, it is important to recognize fundamental demographic changes in the United States and the increasing portion of the population now attending institutions of higher learning. In the late 1950s, there were 2.5 million students enrolled in colleges and universities full-time and 1.25 million part-time students. These figures grew rapidly since they were first collected. Today, there are around 13 million full-time students and 8 million part-time students. These figures are expected to reach 14.4 and 8.8 million, respectively, by 2024. The growth over time has been approximately linear with subtle troughs and peaks corresponding to demographic expansions (e.g. baby-boomers, millennial expansion) in the broader American population.
 
 ``` r
-par(mar=c(9,5,2,2), bg="old lace")
-t1<-NCESenroll
-t2<-NCESproject
-t1[-1]<-t1[-1]/1000000
-t2[-1]<-t2[-1]/1000000
-plot(t1$YEAR,t1$FULLTIME, ylab="Number of Students (in millions)",xlab="Year",main="Number of Postsecondary Students", type="l", xlim=c(1959, 2024), ylim = c(1,15), col="darkgreen", lwd=2)
-points(t2$YEAR,t2$FULLTIME, col="red", type="l", lwd=2)
-points(t1$YEAR,t1$PARTTIME,type="l",lwd=2, col="blue")
-points(t2$YEAR,t2$PARTTIME,type="l",lwd=2, col="red")
-mtext("Evans & Furstenberg",side=1,line=3,adj=0,cex=.6,col="black")
-mtext("Source: U.S. Department of Education, National Center for Education Statistics, Biennial Survey of Education in \n the United States; Opening Fall Enrollment in Higher Education, 1963 through 1965; Higher Education General \n Information Survey (HEGIS), 'Fall Enrollment in Colleges and Universities' surveys, 1966 through 1985; Integrated \n Postsecondary Education Data System (IPEDS), 'Fall Enrollment Survey' (IPEDS-EF:86-99); IPEDS Spring 2001 \n through Spring 2014, NCES Enrollment component and Enrollment in Degree-Granting Institutions Projection \n Model, 1980 through 2024",side=1,line=7,adj=0,cex=.6,col="black")
-legend(1960,15,c('Full-time Students','Part-time Students','Projections'),lty=rep(1,3), lwd=rep(2,3),col=c("darkgreen","blue","red"), cex=.9, bg="white")
+EnrollTab %>%
+  select(Year, Fulltime,Parttime, Projection) %>%
+  gather(Status, Count, 2:3) %>%
+  ggplot(aes(x=Year, y=Count, group=Status, colour=Status)) + 
+  geom_line() +
+  geom_line(size=1) +
+  labs(title="Postsecondary Enrollment", subtitle= "By Full-time and Part-time Status",x="Year", y = "Students (in Millions)") +
+  labs(caption = "Evans & Furstenberg. IPEDS 1959-2024 (IES-calculated Projections).") +
+  scale_color_discrete("Student Status", labels = c('Full-time','Part-time'))
 ```
 
 ![Increases in Student Enrollment](graphs/Student_Enrollment-1.png)
