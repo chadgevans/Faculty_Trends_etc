@@ -131,16 +131,19 @@ EnrollTab %>%
   geom_line() +
   geom_line(size=1) +
   labs(title="Postsecondary Enrollment", subtitle= "By Full-time and Part-time Status",x="Year", y = "Students (in Millions)") +
-  labs(caption = "Evans & Furstenberg. IPEDS 1959-2024 (IES-calculated Projections).") +
+  labs(caption = "Evans & Furstenberg. IPEDS 1959-2026 (IES-calculated Projections).") +
   scale_color_discrete("Student Status", labels = c('Full-time','Part-time'))
 ```
 
 Historically, higher education has been very dependent on government support and public financial support has increased yearly for decades.  However, while the government's absolute subsidization of higher education has increased over time, it has not kept up with the expansion in the student population.  As a result, the per-pupil rate of government support has slowly declined.  This has forced institutions to pursue cost-saving measures and alternative sources of revenue.  In large part, the public has shifted the financial burden of higher education from taxpayers onto the students themselvee.  This is evident from the conistent increase in tuition over the last decades.
 
 ```{r Real_Tuition, fig.cap="Tuition Costs", fig.height=5, fig.width=7, warning=FALSE}
+tuition_table<-tuition_table[!(tuition_table$CONTROL=="All" | tuition_table$CONTROL=="Private"),] 
+#tuition_table<-tuition_table[!(tuition_table$CONTROL=="PRIVATE" & tuition_table$YEAR>=1999),] 
 tuition_table %>% 
-  gather(CONTROL, TUITION, 2:7) %>% 
-  ggplot(aes(x=YEAR, y=TUITION, group=CONTROL, colour=CONTROL)) + 
+  gather(TYPE, TUITION, 2:3) %>% 
+  unite("INST",c(CONTROL, TYPE)) %>%
+  ggplot(aes(x=YEAR, y=TUITION, group=INST, colour=INST)) + 
   geom_line() +
   geom_line(size=1) +
   scale_color_discrete("Institution Type", labels = c('Private For-profit Four-year','Private For-profit Two-year','Private Non-profit Four-year','Private Non-profit Two-year','Public Four-year Institutions','Public Two-year Institutions')) +
@@ -181,34 +184,33 @@ table<-Delta_table %>%
   mutate(Total=rowSums(., na.rm=T), PCT_INSTRUCT=100*instruction01/Total, YEAR=1987:2013)
 table<-table[,c(13,2:12)]
 kable(table)
+```
+
+```{r, echo=FALSE}
 table[which.min(table$PCT_INSTRUCT),"YEAR"]
 table[which.max(table$PCT_INSTRUCT),"YEAR"]
 ```
 
 
-```{r Higher_Ed_Expenses_2014, fig.cap="Distribution of Higher Education Expenses in 2014"}
-op <- par(mar = c(12,5,4,2) + 0.1, bg="aliceblue") ## default is c(5,4,4,2) + 0.1
-bp<-expensedata[-11,3]*1000/1000000000 # adjusted for 1000s, converted to billions
-barplot<-barplot(bp, axes = FALSE, axisnames = FALSE, main="Distribution of Expenses in Higher Education in 2014", ylab="Expenses (in billions)", col=blues9, cex.lab=1, cex.names=5)
-labels<-row.names(expensedata)[-11]
-text(barplot, par('usr')[3], labels = labels, srt = 45, adj = c(1.1,1.1), xpd = TRUE, cex=.9)
-axis(2)
-title(xlab = "Expense Categories", cex.lab = 1, line = 6.5)
-mtext("Evans & Furstenberg",side=1,line=8,adj=0,cex=.7,col="black")
-mtext("Source: U.S. Department of Education, National Center for Education Statistics, Integrated \n Postsecondary Education Data System (IPEDS),Finance component (provisional data) 2014.",side=1,line=9.5,adj=0,cex=.7,col="black")
+```{r Higher_Ed_Expenses_2014, fig.cap="Distribution of Higher Education Expenses in 2014", fig.height=5, fig.width=7}
+expensedata %>% 
+  ggplot(aes(x=EXPENSE, y=ALL)) + 
+  geom_bar(stat="identity", fill='dodgerblue4') +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(title = "Distribution of Expenses in Higher Education in 2014", x = "Expense Type", y = "Expense (in billions)") +
+  labs(caption = "Evans & Furstenberg. NCES IPEDS Finance Component 2014.") +
+  theme(panel.background = element_rect(fill = 'aliceblue', colour = 'black'))
 ```
 
 Public and Private institutions allocate resources in similar ways.  In both cases, instruction is far and away the most sizeable cost.  Public institutions, however, spend a bit more on public service and student aid.  Private institutions channel a higher proportion of resources towards independent operations and institutional support.  While the disribution of expenses is fairly similar, the absolute expenditures are different.  Private institutions spend considerably less in the broader scope of higher education.  This may be because public instutions educate greater numbers of students overall (and thus must spend more to accomplish this).  Potentially, however, private institutions may be more efficient.  Further research should clarify this.  In any case, public institutions spent 315 billion overall and private institutions spent 173 billion in 2014.  
 
 ```{r Table2}
-attach(expensedata)
-table<-expensedata*1000/1000000000
-colnames(table)<-c("Public Institutions","Private Institutions","All Institutions")
-Total<-table[11,]
-table<-as.data.frame(prop.table(as.matrix(table[-11,]),2))
-kable(100*table, caption = "Distribution of budget expenses in Public and Private colleges and universities in 2014", digits=2)
-rm(table)
-detach(expensedata)
+expensedata[-1] <-expensedata[-1] %>% 
+  as.matrix() %>% 
+  prop.table(margin = 2) %>%
+  `*`(100) %>%
+  round(1)
+kable(expensedata, caption = "Distribution of budget expenses in Public and Private colleges and universities in 2014")
 ```
 
 In short, IPEDS data show that the student population has grown rapidly since the late 1950s.  However, as this population growth was so substantial, public subsidization of higher education has been unable to keep up in terms of per-pupil expenditures (SHEEO Report).  As a result, institutions have passed an increasing share of the financial burden onto students in the form of higher tuition and fees.  Government programs like Stafford loans and private financing have provided a means and mechanism for students to take on this burden, binding them financially in student debt, sometimes for decades.  Market forces have compelled institutions to innovate and reduce costs whereever possible.  As instruction constitutes a third of the budget, it has often been the target of many changes.
