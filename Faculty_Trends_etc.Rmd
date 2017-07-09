@@ -286,29 +286,10 @@ Inst_Carnegie_table %>%
   ggplot(aes(x=YEAR, y=COUNT, group=CARNEGIE, colour=CARNEGIE)) + 
   geom_line() +
   geom_line(size=1) +
-  scale_color_discrete("Degree-granting status", labels = c('Degree-granting Institutions','Non-degree-granting Institutions')) +
-  labs(title="Growth in Postsecondary Institutions by Degree-granting Status", subtitle= "1996-2015", x="Year", y = "Number of Institutions") +
+  scale_color_discrete("Degree-granting status", labels = c('Associates Institutions','Baccalaureate Institutions','Masters Institutions','Doctoral Institutions','Specialized Institutions','Tribal Institutions')) +
+  labs(title="Growth in Postsecondary Institutions by Carnegie Classification", subtitle= "1994-2014", x="Year", y = "Number of Institutions") +
   theme(axis.text=element_text(size=10), axis.title=element_text(size=10), legend.text=element_text(size=10), legend.title=element_text(size=10)) +
-  labs(caption = "Evans & Furstenberg. NCES IPEDS Survey of Institutional Characteristics 1996-2015.")
-
-
-
-
-
-mypalette<-brewer.pal(6, "Set2")
-attach(Inst_Carnegie_table)
-par(mar=c(9,5,4,2), bg="oldlace")
-plot(YEAR,RESDOC, ylab="Number of Institutions",xlab="Year", ylim=c(0,1800), main="Growth of Institutions by Carnegie Classification", type="l", col=mypalette[1], lwd=2)
-points(YEAR,MASTERS, col=mypalette[2], type="l", lwd=2)
-points(YEAR,BAS, col=mypalette[3], type="l", lwd=2)
-points(YEAR,ASSOCS, col=mypalette[4], type="l", lwd=2)
-points(YEAR,SPECIAL, col=mypalette[5], type="l", lwd=2)
-points(YEAR,TRIBAL, col=mypalette[6], type="l", lwd=2)
-legend(2005,1400,c('Doctoral Institutions','Masters Institutions','Baccalaureate Institutions','Associates Institutions','Specialized Institutions','Tribal Institutions'),lty=c(1,1), lwd=c(2.5,2.5),col=c(mypalette), cex=.8, bg="white")
-mtext("Evans and Furstenberg",side=1,line=3,adj=0,cex=.7,col="black")
-mtext("Source: U.S. Department of Education, National Center for Education Statistics, Integrated \n Postsecondary Education Data System (IPEDS), Survey of Institutional Characteristics.",side=1,line=5,adj=0,cex=.7,col="black")
-mtext("Note: Changes in counts of institutions over time are partly affected by changes in survey design and \n changes in Carnegie categories. Carnegie classification only pertains to degree-granting institutions.",side=1,line=6.5,adj=0,cex=.7,col="black")
-detach(Inst_Carnegie_table)
+  labs(caption = "Evans & Furstenberg. NCES IPEDS Survey of Institutional Characteristics 1994-2014.")
 ```
 
 Each class of institution in the Carnegie system has grown since the early 1990s.  The growth of Bachelor's, Master's and Specialized institutions has been comparable during this time period.  There were approximately 500 institutions in each of these categories in the early 1990s and their numbers have increased by about 50\% since that time.  The growth of Tribal institutions and doctoral institutions has been more moderate.  There were 232 doctorate institutions in 1994.  In 2014, there were 290.  Associate's institutions are the most prevalent institutional class and have also experienced the most growth in recent times.  Their numbers increased from 1216 in 1994 to 1708 in 2014.  At both time points, Associate's institutions have held about forty percent of the "market share" of degree-granting institutions.
@@ -318,18 +299,17 @@ Each class of institution in the Carnegie system has grown since the early 1990s
 Finally, we examine the use of tenure systems in postsecondary education.  Historically, virtually every institution held a body of permanent faculty with tenured contracts.  It is well-known that the number of tenure systems as declined over time.  In the following figure, we document this trend in schools by institutional sector (level and control).  
 
 ```{r Pct_Inst_w_Tenure_Sys_over_Time, fig.cap="Percent of Institutions with Tenure Systems, by Sector"}
-mypalette<-brewer.pal(5, "Set1")
-attach(Inst_Ten_table)
-par(mar=c(7,4.5,4,2), bg="oldlace")
-plot(YEAR,PUB4YRTOTAL, ylab="Percent",xlab="Year",main="Percent of Institutions with Tenure Systems, by Sector", type="l", col=mypalette[1], ylim=c(0,100), lwd=2)
-points(YEAR, PUB2YR, type="l", col=mypalette[2], lwd=2)
-points(YEAR, NONPROF4YRTOTAL, type="l", col=mypalette[3], lwd=2)
-points(YEAR, NONPROF2YR, type="l", col=mypalette[4], lwd=2)
-points(YEAR, FORPROF, type="l", col=mypalette[5], lwd=2)
-mtext("Evans and Furstenberg",side=1,line=3,adj=0,cex=.7,col="black")
-mtext("Source: U.S. Department of Education, National Center for Education Statistics, Integrated \n Postsecondary Education Data System (IPEDS), Survey of Institutional Characteristics.",side=1,line=5,adj=0,cex=.7,col="black")
-legend(2004,50,c("Public, 4-Yr. Institutions", "Public, 2-Yr. Institutions","Private, 4-Yr. Institutions","Private 2-Yr., Institutions","Private, For-profit Institutions"),lty=c(1,1), lwd=c(2.5,2.5),col=mypalette, cex=.75, bg="white")
-detach(Inst_Ten_table)
+Tenure_table %>%
+  filter(UNIT=="INST") %>% 
+  gather(TENURE, PCT, 2:15)  %>% 
+  filter(TENURE %in% c("FORPROF","PUB4YRTOTAL","PUB2YR","NONPROF4YRTOTAL","NONPROF2YR")) %>%
+  ggplot(aes(x=YEAR, y=PCT, group=TENURE, colour=TENURE)) + 
+  geom_line() +
+  geom_line(size=1) +
+  scale_color_discrete("Institutional Sector", labels = c("For-profit", "Non-Profit 2-Year", "Non-profit 4-Year", "Public 2-Year", "Public 4-Year")) +
+  labs(title="Percent of Institutions with Tenure Systems, by Sector", subtitle= "1993-2015", x="Year", y = "Percent of Institutions") +
+  theme(axis.text=element_text(size=10), axis.title=element_text(size=10), legend.text=element_text(size=10), legend.title=element_text(size=10)) +
+  labs(caption = "Evans & Furstenberg. NCES IPEDS Survey of Institutional Characteristics 1993-2015.")
 ```
 
 From Figure 9, it is clear that institutions vary greatly in their use (or non-use) of tenure systems.  Only a small fraction of for-profit institutions utilize a tenure system for managing permanent employees.  Public, four-year instiutions, on the other hand, commonly do utilize a tenure system.  The use of tenure systems in other institutional types, however, does seem to be on a very slow decline.  In general, tenure systems seem to be disappearing, although the rate of disappearance may have flattened out in recent times.
@@ -343,13 +323,15 @@ Second, some institutional types have grown more than others and it is worth hig
 The other important area of prominent growth has been less-than-two-year institutions.  Not only has their number increased in recent times, but their growth has been accelerating over the last decade and a half.  Today, there are as many less-than-two-year institutions as there are traditional two-year institutions.  Some of these programs result in a terminal degree, but many no doubt simply provide an unaccredited certificate.  It is not clear what the reasons are for this growth, nor what the consequences will be.  Nearly a third of institutions today are less-than-two-year institutions.
 
 ```{r}
-table<-Delta_Crosstable*100
-rownames(table)<-c("Four-year","Two-year","Less-than-two-year")
-colnames(table)<-c("Public","Private Non-profit","For-profit")
-kable(table, caption = "Crosstabulation of Level and Control (in percentages)", fig.align="center")
+Delta_Crosstable %>%
+  `*`(100) %>%
+  round(1) %>%
+  `colnames<-`(c("Public","Private Non-profit","For-profit")) %>%
+  `rownames<-`(c("Four-year","Two-year","Less-than-two-year")) %>%
+  kable(caption = "Crosstabulation of Level and Control (in percentages)", fig.align="center")
 ```
 
-A simple crosstabluation of institutional level and institutional control reveals how interrelated the for-profit sector is with less-than-two-year institutions.  Examing row sums, 84\% of less-than-two-year institutions are for-profit.  Or alternatively, 70\% of for-profit institutions are less-than-two-year (column sum).  Clearly, the for-profit, 2-year sector is a growing and important player on the stage of higher education.
+A simple crosstabluation of institutional level and institutional control reveals how interrelated the for-profit sector is with less-than-two-year institutions.  Examing row sums, 84\% (54.9/54.9+3.3+9.5) of less-than-two-year institutions are for-profit.  Or alternatively, 70\% of for-profit institutions are less-than-two-year (column sum).  Clearly, the for-profit, 2-year sector is a growing and important player on the stage of higher education.
 
 # Reining in Postsecondary Expenses
 

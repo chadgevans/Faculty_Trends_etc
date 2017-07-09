@@ -24,6 +24,7 @@ tuition_table<-ttable
 rm(ttable)
 
 # Delta Project Institutional Expenses
+#https://nces.ed.gov/ipeds/deltacostproject/
 keeperCols <- c("academicyear","acadsupp01","auxiliary01","hospital01","independ01","instsupp01","instruction01","pubserv01","research01","opermain01", "grants01", "other01", "studserv01")
 df1<-read.csv(file.path(Data, "delta_public_release_00_13.csv"))
 df2<-read.csv(file.path(Data, "delta_public_release_87_99.csv"))
@@ -38,9 +39,6 @@ etable<- etable %>%
   mutate_each(funs(./1000000000), -academicyear)
 Delta_table<-etable
 rm(etable)
-
-# Expenses by level
-https://nces.ed.gov/programs/digest/d16/tables/dt16_334.30.asp
 
 # IPEDS Expenses by Category 2014
 # https://nces.ed.gov/ipeds/trendgenerator
@@ -62,7 +60,6 @@ setwd("/Users/chadgevans/Research/Projects/Data/Faculty_Trends_etc_data/Custom_D
 file_list <- list.files()
 datalist<-lapply(file_list, function(x){read.table(x, header=TRUE, sep=",")})
 datalist <- lapply(datalist,function(x) {colnames(x) <- toupper(colnames(x));x})
-
 names(datalist[[1]])<-c("UNITID","INSTNAME","YEAR","LEVEL","CONTROL","DEGREE","CARNEGIE")
 names(datalist[[2]])<-c("UNITID","INSTNAME","YEAR","CONTROL","LEVEL")
 names(datalist[[3]])<-c("UNITID","INSTNAME","YEAR","LEVEL","CONTROL")
@@ -98,6 +95,10 @@ names(datalist[[32]])<-c("UNITID","INSTNAME","YEAR","LEVEL","CONTROL","CARNEGIE"
 names(datalist[[33]])<-c("UNITID","INSTNAME","YEAR","LEVEL","CONTROL","DEGREE","CARNEGIE")
 data<-do.call("rbind.fill", mapply(cbind, datalist, YEAR = list(2012,1986,1984,2008,2000,2014,1988,1995,2011,2015,1980,2007,2003,1991,1985,1987,2001,2004,1992,2006,1996,1998,2013,1993,1997,2009,1989,2010,1990,2002,2005,1994,1999), SIMPLIFY = FALSE))
 levels(data$LEVEL)<-c(NA,"2to4","4+","Less2","4+","2to4","Less2","2to4",NA,NA,"4+","Less2","2to4",NA, NA, "2to4","2to4","4+","4+","2to4","4+",NA,"2to4",NA,NA) # STRRONG ASSuMPTION: coded less than BA to 2to4
+data$CONTROL<-as.factor(data$CONTROL)
+levels(data$CONTROL)<-c(NA,NA,NA,"Public","Private non-profit","Private for-profit", NA,NA,NA,NA,NA,"Private for-profit","Private for-profit","Private non-profit","Private non-profit",NA,"Private for-profit","Private non-profit","Private non-profit",NA,"Public","Public","Public","Private non-profit") # Last two NA's were because of "only private" 
+levels(data$DEGREE)<-c(NA, "Degree","NonDegree",NA,"NonDegree","NonDegree","NonDegree","Degree","Degree","Degree","Degree","Degree","NonDegree","Degree","Degree","Degree","Degree","Degree",NA,"Degree","Degree","Degree","Degree","NonDegree","Degree",NA,NA,"Degree","Degree",NA,"Degree", "NonDegree","NonDegree","NonDegree",NA)
+levels(data$CARNEGIE)<-c(NA,rep("ASSOCS",14),rep("BAS",3),"RESDOC",rep("MASTERS",3),"SPECIAL", NA, rep("SPECIAL",3),"RESDOC","RESDOC",rep("SPECIAL",5),"TRIBAL",NA,rep("SPECIAL",9),NA,"ASSOCS",rep("BAS",3),rep("RESDOC",2),rep("MASTERS",2),rep("SPECIAL",5),"TRIBAL","ASSOCS",rep("BAS",2), rep("RESDOC",2), rep("MASTERS",2), "SPECIAL",NA,"SPECIAL","RESDOC","RESDOC", "SPECIAL",rep("ASSOCS",9),rep("BAS",4),rep("RESDOC",3),rep("MASTERS",3),rep("SPECIAL",13),NA,"ASSOCS","BAS",rep("RESDOC",2),rep("MASTERS",2),"SPECIAL","TRIBAL",NA,"ASSOCS",rep("BAS",2), rep("RESDOC",2), rep("MASTERS",2),rep("RESDOC",2), "ASSOCS","BAS",rep("MASTERS",2),rep("SPECIAL",2)) 
 
 # Level
 table <- data %>% 
@@ -110,13 +111,9 @@ table <- data %>%
   `colnames<-`(c("YEAR", "TWOFOUR","FOUR","LESS2"))
 table[1:3,"LESS2"]<-NA # Data was poorly collected from less2 schools at this time
 Inst_Level_table<-table
-
 # Control
 table<-data %>% 
   select(YEAR,CONTROL) %>%
-  mutate(CONTROL=factor(CONTROL))
-levels(table$CONTROL)<-c(NA,NA,NA,"Public","Private non-profit","Private for-profit", NA,NA,NA,NA,NA,"Private for-profit","Private for-profit","Private non-profit","Private non-profit",NA,"Private for-profit","Private non-profit","Private non-profit",NA,"Public","Public","Public","Private non-profit") # Last two NA's were because of "only private" 
-table<- table %>% 
   group_by(YEAR, CONTROL) %>%
   summarise(COUNT=n()) %>%
   na.omit() %>% # Data was poorly collected from less2 schools at this time
@@ -125,13 +122,9 @@ table<- table %>%
 table$PRIVNPROF[table$YEAR<1987]<-NA # Problems with private only classifiacation in the 1980s.
 table$PRIV4PROF[table$YEAR<1987]<-NA # Problems with private only classifiacation in the 1980s
 Inst_Control_table<-table
-
 # Degree-granting status
 table<-data %>% 
   select(YEAR,DEGREE) %>%
-  mutate(DEGREE=factor(DEGREE))
-levels(table$DEGREE)<-c(NA, "Degree","NonDegree",NA,"NonDegree","NonDegree","NonDegree","Degree","Degree","Degree","Degree","Degree","NonDegree","Degree","Degree","Degree","Degree","Degree",NA,"Degree","Degree","Degree","Degree","NonDegree","Degree",NA,NA,"Degree","Degree",NA,"Degree", "NonDegree","NonDegree","NonDegree",NA)
-table<- table %>% 
   group_by(YEAR, DEGREE) %>%
   summarise(COUNT=n()) %>%
   na.omit() %>% # Data was poorly collected from less2 schools at this time
@@ -140,13 +133,9 @@ table<- table %>%
 table$DEGREE[table$YEAR==1997]<-NA
 table$NONDEGREE[table$YEAR==1997]<-NA
 Inst_Degree_table<-table
-
 # Carnegie
 table<-data %>% 
   select(YEAR,CARNEGIE) %>%
-  mutate(CARNEGIE=factor(CARNEGIE))
-levels(table$CARNEGIE)<-c(NA,rep("ASSOCS",14),rep("BAS",3),"RESDOC",rep("MASTERS",3),"SPECIAL", NA, rep("SPECIAL",3),"RESDOC","RESDOC",rep("SPECIAL",5),"TRIBAL",NA,rep("SPECIAL",9),NA,"ASSOCS",rep("BAS",3),rep("RESDOC",2),rep("MASTERS",2),rep("SPECIAL",5),"TRIBAL","ASSOCS",rep("BAS",2), rep("RESDOC",2), rep("MASTERS",2), "SPECIAL",NA,"SPECIAL","RESDOC","RESDOC", "SPECIAL",rep("ASSOCS",9),rep("BAS",4),rep("RESDOC",3),rep("MASTERS",3),rep("SPECIAL",13),NA,"ASSOCS","BAS",rep("RESDOC",2),rep("MASTERS",2),"SPECIAL","TRIBAL",NA,"ASSOCS",rep("BAS",2), rep("RESDOC",2), rep("MASTERS",2),rep("RESDOC",2), "ASSOCS","BAS",rep("MASTERS",2),rep("SPECIAL",2)) 
-table<- table %>% 
   group_by(YEAR, CARNEGIE) %>%
   summarise(COUNT=n()) %>%
   na.omit() %>% # Data was poorly collected from less2 schools at this time
@@ -154,11 +143,18 @@ table<- table %>%
 table<-table[!table$YEAR==2015,] # Strange reclassification of data.
 Inst_Carnegie_table<-table
 
+Delta_Crosstable<-prop.table(table(data$LEVEL, data$CONTROL))
 
 
-
-
-
+# IPEDS
+#Percentage of degree-granting postsecondary institutions with a tenure system and of full-time faculty with tenure at these institutions, by control and level of institution and selected characteristics of faculty: Selected years, 1993-94 through 2015-16
+# https://nces.ed.gov/programs/digest/d14/tables/dt14_316.80.asp
+table<-read_csv(file.path(Data, "tabn316.80.csv"), skip=6, na=c("---", "","‡", "†"), n_max = 25)
+names(table)<-c("YEAR","ALLINST","PUBTOTAL","PUB4YRTOTAL","PUB4YRDOC","PUB4YRMA","PUB4YROTH","PUB2YR","NONPROFTOTAL","NONPROF4YRTOTAL","NONPROF4YRDOC","NONPROF4YRMA","NONPROF4YROTH","NONPROF2YR","FORPROF")
+table$YEAR<-as.numeric(gsub("([0-9]+).*$", "\\1", table$YEAR))
+table<-table[rowSums(is.na(table))!=15,]
+table$UNIT<-as.factor(c(rep("INST",9), rep("FACULTY",9)))
+Tenure_table<-table
 
 
 
