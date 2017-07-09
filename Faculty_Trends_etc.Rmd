@@ -323,6 +323,7 @@ Second, some institutional types have grown more than others and it is worth hig
 The other important area of prominent growth has been less-than-two-year institutions.  Not only has their number increased in recent times, but their growth has been accelerating over the last decade and a half.  Today, there are as many less-than-two-year institutions as there are traditional two-year institutions.  Some of these programs result in a terminal degree, but many no doubt simply provide an unaccredited certificate.  It is not clear what the reasons are for this growth, nor what the consequences will be.  Nearly a third of institutions today are less-than-two-year institutions.
 
 ```{r}
+Delta_Crosstable <- prop.table(table(data$LEVEL, data$CONTROL), 2)
 Delta_Crosstable %>%
   `*`(100) %>%
   round(1) %>%
@@ -331,7 +332,7 @@ Delta_Crosstable %>%
   kable(caption = "Crosstabulation of Level and Control (in percentages)", fig.align="center")
 ```
 
-A simple crosstabluation of institutional level and institutional control reveals how interrelated the for-profit sector is with less-than-two-year institutions.  Examing row sums, 84\% (54.9/54.9+3.3+9.5) of less-than-two-year institutions are for-profit.  Or alternatively, 70\% of for-profit institutions are less-than-two-year (column sum).  Clearly, the for-profit, 2-year sector is a growing and important player on the stage of higher education.
+A simple crosstabluation of institutional level and institutional control reveals how interrelated the for-profit sector is with less-than-two-year institutions.  Examing row sums, 81\% (18.6/(18.6+1 + 3.4)) of less-than-two-year institutions are for-profit.  Or alternatively, 55\% (54.9/(54.9+14.3+30.8)) of for-profit institutions are less-than-two-year (column sum).  Clearly, the for-profit, 2-year sector is a growing and important player on the stage of higher education.
 
 # Reining in Postsecondary Expenses
 
@@ -344,6 +345,19 @@ One controversial way for colleges and universities to reduce costs has been to 
 To begin with, we examine the proportion of non-tenure track faculty across all institutions in the United States.  We also factor in the full-time or part-time status of adjuncts, as this is known to be important to the tenure system.  Before interpreting Figure 10, however, it is important to consider the improbable dip or shift occuring between 2011 and 2012 in this graph.  It is unclear why such a pattern came about, however, it might be related to a major change made in how occupations were classified since 2012.  The Department of Education made these changes in order to align the Human Resources component of IPEDS with the 2010 Standard Occupational Classification (SOC) System.  In the following paragraphs, we will try to identify patterns as best we can.
 
 ```{r IPEDS_Tenure_Pct_over_Time, fig.cap="Percentage of Faculty Types in Postsecondary Education (IPEDS)"}
+Tenure_table %>%
+  filter(UNIT=='FACULTY') %>% 
+  gather(TENURE, PCT, 2:15) %>% 
+  filter(TENURE %in% c("FORPROF","PUB4YRTOTAL","PUB2YR","NONPROF4YRTOTAL","NONPROF2YR")) %>%
+  ggplot(aes(x=YEAR, y=PCT, group=TENURE, colour=TENURE)) + 
+  geom_line() +
+  geom_line(size=1) +
+  scale_color_discrete("Institutional Sector", labels = c("For-profit", "Non-Profit 2-Year", "Non-profit 4-Year", "Public 2-Year", "Public 4-Year")) +
+  labs(title="Percent of Institutions with Tenure Systems, by Sector", subtitle= "1993-2015", x="Year", y = "Percent of Institutions") +
+  theme(axis.text=element_text(size=10), axis.title=element_text(size=10), legend.text=element_text(size=10), legend.title=element_text(size=10)) +
+  labs(caption = "Evans & Furstenberg. NCES IPEDS Survey of Institutional Characteristics 1993-2015.")
+```
+
 options(digits = 3,scipen=999) # turn off Scientific Notation
 mypalette<-brewer.pal(4, "Set2")
 # Tenure_table[11:14,"PT"]<-c(45.7, 45.6, 45.6, 45.2) # add 3

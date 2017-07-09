@@ -142,9 +142,11 @@ table<-data %>%
   spread(CARNEGIE, COUNT)
 table<-table[!table$YEAR==2015,] # Strange reclassification of data.
 Inst_Carnegie_table<-table
-
-Delta_Crosstable<-prop.table(table(data$LEVEL, data$CONTROL))
-
+# Level x Control Crosstabulation
+table<-data %>% 
+  select(LEVEL,CONTROL) %>%
+  na.omit()
+Delta_Crosstable<-table
 
 # IPEDS
 #Percentage of degree-granting postsecondary institutions with a tenure system and of full-time faculty with tenure at these institutions, by control and level of institution and selected characteristics of faculty: Selected years, 1993-94 through 2015-16
