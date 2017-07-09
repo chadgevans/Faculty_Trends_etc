@@ -233,7 +233,7 @@ Inst_Level_table %>%
   scale_color_discrete("Institution Level", labels = c('4-year',"less than 2-year",'2-year')) +
   labs(title="Growth in Postsecondary Institutions by Level", subtitle= "1989-2015", x="Year", y = "Number of Institutions") +
   theme(axis.text=element_text(size=10), axis.title=element_text(size=10), legend.text=element_text(size=10), legend.title=element_text(size=10)) +
-  labs(caption = "Evans & Furstenberg. IPEDS Survey of Institutional Characteristics 1989-2015.")
+  labs(caption = "Evans & Furstenberg. NCES IPEDS Survey of Institutional Characteristics 1989-2015.")
 ```
 
 
@@ -251,25 +251,9 @@ Inst_Control_table %>%
   geom_line() +
   geom_line(size=1) +
   scale_color_discrete("Institutional Control", labels = c('For-Profit Institutions','Private Non-profit Institutions', 'Public Institutions')) +
-  labs(title="Growth in Postsecondary Institutions by Level", subtitle= "1989-2015", x="Year", y = "Number of Institutions") +
+  labs(title="Growth in Postsecondary Institutions by Control", subtitle= "1980-2015", x="Year", y = "Number of Institutions") +
   theme(axis.text=element_text(size=10), axis.title=element_text(size=10), legend.text=element_text(size=10), legend.title=element_text(size=10)) +
-  labs(caption = "Evans & Furstenberg. IPEDS Survey of Institutional Characteristics 1989-2015.")
-
-
-
-Inst_Control_table<-table
-
-
-mypalette<-brewer.pal(3, "Set2")
-par(mar=c(9,5,4,2), bg="oldlace")
-plot(YEAR,PUBLIC, ylab="Number of Institutions",xlab="Year", ylim=c(0,3500), main="Growth of Institutions by Control", type="l", col=mypalette[1], lwd=2)
-points(YEAR,PRIVNPROF, col=mypalette[2], type="l", lwd=2)
-points(YEAR,PRIV4PROF, col=mypalette[3], type="l", lwd=2)
-legend(1980,3500,c('Public Institutions','Private Non-profit Institutions','For-Profit Institutions'),lty=c(1,1,1), lwd=c(2.5,2.5,2.5),col=mypalette, cex=1, bg="white")
-mtext("Evans and Furstenberg",side=1,line=3,adj=0,cex=.7,col="black")
-mtext("Source: U.S. Department of Education, National Center for Education Statistics, Integrated \n Postsecondary Education Data System (IPEDS), Survey of Institutional Characteristics.",side=1,line=5,adj=0,cex=.7,col="black")
-mtext("Note: Changes in counts of institutions over time are partly affected by changes in survey design and \n choices of categorization.",side=1,line=6.5,adj=0,cex=.7,col="black")
-detach(Inst_Control_table)
+  labs(caption = "Evans & Furstenberg. NCES IPEDS Survey of Institutional Characteristics 1980-2015.")
 ```
 
 It is clear from Figure 6 that the most dramatic change in institutional control is among private, for-profit institutions.  In 1987, there were only 1102 for-profit postsecondary institutions.  By 2015, there were 3454--an increase of over 200\% in only thirty years.  The number of public institutions and private, not-for-profit schools has remained more stable over time (growing very slowly compared to the for-profit sector).  For-profit institutions include technical institutes, arts schools, nursing schools, many online programs, some law schools and business schools, to name a few areas.  Some have expressed concern that the profit motive inherent to for-profit institutions is at odds with the mission of higher education.  Others argue that the for-profit sphere fills in badly needed areas ignored by traditional institutions.
@@ -279,16 +263,15 @@ It is clear from Figure 6 that the most dramatic change in institutional control
 Degree-granting institutions offer programs that lead to a terminal degree at the associate’s level or higher.  Degree-granting institutions also participate in the Title IV federal financial aid program.  Many non-degree-granting institutions do not.  Non-degree institutions typically offer certificates of competency, but such awards are not accredited.
 
 ```{r Inst_Growth_by_Degree_over_Time, fig.cap="Institutional Growth by Degree Over Time"}
-attach(Inst_Degree_table)
-mypalette<-brewer.pal(3, "Set1")
-par(mar=c(9,5,4,2), bg="oldlace")
-plot(YEAR,DEGREE, ylab="Number of Institutions",xlab="Year", ylim=c(0,5500), main="Growth of Institutions by Degree-granting Status", type="l", col=mypalette[1], lwd=2)
-points(YEAR,NONDEGREE, col=mypalette[2], type="l", lwd=2)
-legend(1996,5500,c('Degree-granting Institutions','Non-degree-granting Institutions'),lty=c(1,1), lwd=c(2.5,2.5),col=mypalette, cex=1, bg="white")
-mtext("Evans and Furstenberg",side=1,line=3,adj=0,cex=.7,col="black")
-mtext("Source: U.S. Department of Education, National Center for Education Statistics, Integrated \n Postsecondary Education Data System (IPEDS), Survey of Institutional Characteristics.",side=1,line=5,adj=0,cex=.7,col="black")
-mtext("Note: Changes in counts of institutions over time are partly affected by changes in survey design and \n choices of categorization.",side=1,line=6.5,adj=0,cex=.7,col="black")
-detach(Inst_Degree_table)
+Inst_Degree_table %>% 
+  gather(DEGREE, COUNT, 2:3) %>% 
+  ggplot(aes(x=YEAR, y=COUNT, group=DEGREE, colour=DEGREE)) + 
+  geom_line() +
+  geom_line(size=1) +
+  scale_color_discrete("Degree-granting status", labels = c('Degree-granting Institutions','Non-degree-granting Institutions')) +
+  labs(title="Growth in Postsecondary Institutions by Degree-granting Status", subtitle= "1996-2015", x="Year", y = "Number of Institutions") +
+  theme(axis.text=element_text(size=10), axis.title=element_text(size=10), legend.text=element_text(size=10), legend.title=element_text(size=10)) +
+  labs(caption = "Evans & Furstenberg. NCES IPEDS Survey of Institutional Characteristics 1996-2015.")
 ```
 
 The educational landscape with regard to degree-granting status has remained fairly stable over the last decades.  Both degree-granting and non-degree-granting instutions have increased slowly in number, but their rates of growth are comparable over time.  Today, and historically, degree-granting institutions outnumber institutions without accreditation by about two to one.
@@ -298,6 +281,20 @@ The educational landscape with regard to degree-granting status has remained fai
 A useful analytic framework for examining postsecondary institutions was developed by the Carnegie Foundation.  The basic Carnegie classification framework separates degree-granting institutions into one of six categories, based principally on the type of degrees the institution typically awards.  Doctoral institutions are research institutions awarding high numbers of doctorates.  These instituitions are often distinguished further by their level of research intensity (where R1 refers to institutions with very high research intensity and R3 means moderate research intensity).  Master's, Baccalaureate and Associate's institutions award predominately Master's, Bachelor's and Associate's degrees, respectively.  Specialized institutions award a high number of degrees in one particular field or specialty (e.g., the arts, theology, health/medical training).  Tribal institutions are schools participating in the American Indian Higher Education Consortium.  All Carnegie-classified institutions are degree-granting, meaning that a considerable percentage (one-third) are excluded from Figure 8.
 
 ```{r Inst_Growth_by_Carnegie_over_Time, fig.cap="Institutional Growth by Carnegie Classification Over Time"}
+Inst_Carnegie_table %>% 
+  gather(CARNEGIE, COUNT, 2:7) %>% 
+  ggplot(aes(x=YEAR, y=COUNT, group=CARNEGIE, colour=CARNEGIE)) + 
+  geom_line() +
+  geom_line(size=1) +
+  scale_color_discrete("Degree-granting status", labels = c('Degree-granting Institutions','Non-degree-granting Institutions')) +
+  labs(title="Growth in Postsecondary Institutions by Degree-granting Status", subtitle= "1996-2015", x="Year", y = "Number of Institutions") +
+  theme(axis.text=element_text(size=10), axis.title=element_text(size=10), legend.text=element_text(size=10), legend.title=element_text(size=10)) +
+  labs(caption = "Evans & Furstenberg. NCES IPEDS Survey of Institutional Characteristics 1996-2015.")
+
+
+
+
+
 mypalette<-brewer.pal(6, "Set2")
 attach(Inst_Carnegie_table)
 par(mar=c(9,5,4,2), bg="oldlace")
