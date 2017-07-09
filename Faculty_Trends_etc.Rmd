@@ -223,19 +223,20 @@ Higher enrollment, financial constraints and a demand for contemporary skills ha
 
 By institutional level, we refer to the intensity and duration of academic programs offered by an institution.  The Department of Education classifies institutions into one of three levels: 4-year or higher (4-year), 2-but-less-than-4-year (2-year), and less-than-2-year institutions.  Four-year institutions tend to have the most intense program requirements and many are selective of their students.  They also have strong research programs in many cases.  Two-year institutions tend to have open enrollment policies and focus on career-oriented programs.  These programs typically result in a certificate, a professional-technical degree, or an associate’s degree that is useful for transfering to a four-year institution. Instructional programs at four-year institutions are typically more general than 2-year schools.  Less-than-two-year institutions fullfill a variety of needs (e.g., professional, social, etc.), but typically do not offer formal degrees.  
 
+
 ```{r Inst_Growth_by_Level_over_Time, fig.cap="Growth of Postsecondary Institutions by Level"}
-attach(Inst_Level_table)
-mypalette<-brewer.pal(3, "Set1")
-par(mar=c(9,5,4,2), bg="oldlace")
-plot(YEAR, FOUR, ylab="Number of Institutions",xlab="Year",main="Growth in Postsecondary Institutions by Level", col=mypalette[1], type="l",lwd=2, ylim = c(0,3500))
-points(YEAR,TWOFOUR,col=mypalette[2],type="l",lwd=2)
-points(YEAR,LESS2,col=mypalette[3],type="l",lwd=2)
-legend(1980,3500,c('Four-year Institutions','Two-year Institutions','Less-than-2-year Institutions'),lty=c(1,1,1), lwd=c(2,2,2),col=mypalette, cex=1, bg="white")
-mtext("Evans and Furstenberg",side=1,line=3,adj=0,cex=.7,col="black")
-mtext("Source: U.S. Department of Education, National Center for Education Statistics, Integrated \n Postsecondary Education Data System (IPEDS), Survey of Institutional Characteristics.",side=1,line=5,adj=0,cex=.7,col="black")
-mtext("Note: Changes in counts of institutions over time are partly affected by changes in survey design and \n choices of categorization.",side=1,line=6.5,adj=0,cex=.7,col="black")
-detach(Inst_Level_table)
+Inst_Level_table %>% 
+  gather(LEVEL, COUNT, 2:4) %>% 
+  ggplot(aes(x=YEAR, y=COUNT, group=LEVEL, colour=LEVEL)) + 
+  geom_line() +
+  geom_line(size=1) +
+  scale_color_discrete("Institution Level", labels = c('4-year',"less than 2-year",'2-year')) +
+  labs(title="Growth in Postsecondary Institutions by Level", subtitle= "1989-2015", x="Year", y = "Number of Institutions") +
+  theme(axis.text=element_text(size=10), axis.title=element_text(size=10), legend.text=element_text(size=10), legend.title=element_text(size=10)) +
+  labs(caption = "Evans & Furstenberg. IPEDS Survey of Institutional Characteristics 1989-2015.")
 ```
+
+
 
 As seen in Figure 5, the United States has added new postsecondary institutions throughout the entire timespan of this graph.  Of all levels, the four-year sector has added the greatest number of institutions.  There were only 1670 in 1980 and in 2015 there were 3161--a 90\% increase.  Two-year institutions have experienced similar rates of growth, going from 1018 in 1980 to 2195 in 2015 (115\% growth).  There is less information available on less-than-two-year institutions, but we know that their rate of growth has increased rapidly since the turn of the century.  Since 2010 alone, the number of less-than-2-year schools has increased by 30\%.  Today, 40\% of institutions are four-year and the remaining 60\% of institutions are evenly split between two-year and less-than-two-year institutions. 
 
@@ -244,7 +245,21 @@ As seen in Figure 5, the United States has added new postsecondary institutions 
 There are also important changes to the institutional landscape in terms of institutional control.  By control, we mean whether an institution is operated by publicly-elected or appointed officials (public control) or by privately-elected or appointed officials (private control).  Institutions of private control derive their funding principally through private sources.  There are two types of private control: non-profit and for-profit, depending on how the institution handles surplus revenue.  Non-profits use revenue to advance the mission of the institution.  For-profits channel revenue to owners.
 
 ```{r Inst_Growth_by_Control_over_Time, fig.cap="Institutional Growth by Control Over Time"}
-attach(Inst_Control_table)
+Inst_Control_table %>% 
+  gather(CONTROL, COUNT, 2:4) %>% 
+  ggplot(aes(x=YEAR, y=COUNT, group=CONTROL, colour=CONTROL)) + 
+  geom_line() +
+  geom_line(size=1) +
+  scale_color_discrete("Institutional Control", labels = c('For-Profit Institutions','Private Non-profit Institutions', 'Public Institutions')) +
+  labs(title="Growth in Postsecondary Institutions by Level", subtitle= "1989-2015", x="Year", y = "Number of Institutions") +
+  theme(axis.text=element_text(size=10), axis.title=element_text(size=10), legend.text=element_text(size=10), legend.title=element_text(size=10)) +
+  labs(caption = "Evans & Furstenberg. IPEDS Survey of Institutional Characteristics 1989-2015.")
+
+
+
+Inst_Control_table<-table
+
+
 mypalette<-brewer.pal(3, "Set2")
 par(mar=c(9,5,4,2), bg="oldlace")
 plot(YEAR,PUBLIC, ylab="Number of Institutions",xlab="Year", ylim=c(0,3500), main="Growth of Institutions by Control", type="l", col=mypalette[1], lwd=2)

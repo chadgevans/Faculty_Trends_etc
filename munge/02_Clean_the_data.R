@@ -108,5 +108,45 @@ Inst_Level_table <- data %>%
   spread(LEVEL, COUNT) %>%
   na.omit() %>%
   `colnames<-`(c("YEAR", "TWOFOUR","FOUR","LESS2"))
-  
+Inst_Level_table[1:3,"LESS2"]<-NA # Data was poorly collected from less2 schools at this time
+
+# Control
+table<-data %>% 
+  select(YEAR,CONTROL) %>%
+  mutate(CONTROL=factor(CONTROL))
+levels(table$CONTROL)<-c(NA,NA,NA,"Public","Private non-profit","Private for-profit", NA,NA,NA,NA,NA,"Private for-profit","Private for-profit","Private non-profit","Private non-profit",NA,"Private for-profit","Private non-profit","Private non-profit",NA,"Public","Public","Public","Private non-profit") # Last two NA's were because of "only private" 
+table<- table %>% 
+  group_by(YEAR, CONTROL) %>%
+  summarise(COUNT=n()) %>%
+  na.omit() %>% # Data was poorly collected from less2 schools at this time
+  spread(CONTROL, COUNT) %>%
+  `colnames<-`(c("YEAR","PUBLIC","PRIVNPROF","PRIV4PROF"))
+table$PRIVNPROF[table$YEAR<1987]<-NA # Problems with private only classifiacation in the 1980s.
+table$PRIV4PROF[table$YEAR<1987]<-NA # Problems with private only classifiacation in the 1980s
+Inst_Control_table<-table
+
+# Degree
+df<-data[,c("YEAR","DEGREE")] # already in melted form
+levels(df$DEGREE)<-c(NA, "Degree","NonDegree",NA,"NonDegree","NonDegree","NonDegree","Degree","Degree","Degree","Degree","Degree","NonDegree","Degree","Degree","Degree","Degree","Degree",NA,"Degree","Degree","Degree","Degree","NonDegree","Degree",NA,NA,"Degree","Degree",NA,"Degree", "NonDegree","NonDegree","NonDegree",NA) # Last two NA's were because of "only private" 
+table <- dcast(df, YEAR ~ DEGREE, value.var = "DEGREE", function(x) length(x))
+table<-table[,-4]
+names(table)<-c("YEAR","DEGREE","NONDEGREE")
+table<-table[!table$YEAR<1996,]
+table$DEGREE[table$YEAR %in% c(1997)]<-NA
+table$NONDEGREE[table$YEAR %in% c(1997)]<-NA
+table$DEGREE[table$YEAR %in% c(2007)]<-4100 # Imputed
+table$NONDEGREE[table$YEAR %in% c(2007)]<-1850 # Imputed
+Inst_Degree_table<-table
+save(Inst_Degree_table, file="/Users/chadgevans/Dissertation/Projects/Build_Dataset/IPEDS/Cleaned_Data/Inst_Degree_table.RData")
+# Carnegie
+df<-data[,c("YEAR","CARNEGIE")]
+levels(df$CARNEGIE)<-c(NA,rep("ASSOCS",14),rep("BAS",3),"RESDOC",rep("MASTERS",3),"SPECIAL", NA, rep("SPECIAL",3),"RESDOC","RESDOC",rep("SPECIAL",5),"TRIBAL",NA,rep("SPECIAL",9),NA,"ASSOCS",rep("BAS",3),rep("RESDOC",2),rep("MASTERS",2),rep("SPECIAL",5),"TRIBAL","ASSOCS",rep("BAS",2), rep("RESDOC",2), rep("MASTERS",2), "SPECIAL",NA,"SPECIAL","RESDOC","RESDOC", "SPECIAL",rep("ASSOCS",9),rep("BAS",4),rep("RESDOC",3),rep("MASTERS",3),rep("SPECIAL",13),NA,"ASSOCS","BAS",rep("RESDOC",2),rep("MASTERS",2),"SPECIAL","TRIBAL",NA,"ASSOCS",rep("BAS",2), rep("RESDOC",2), rep("MASTERS",2),rep("RESDOC",2), "ASSOCS","BAS",rep("MASTERS",2),rep("SPECIAL",2)) 
+table <- dcast(df, YEAR ~ CARNEGIE, value.var = "CARNEGIE", function(x) length(x))
+table<-table[,-8]
+names(table)<-c("YEAR","ASSOCS","BAS","RESDOC","MASTERS","SPECIAL","TRIBAL")
+table<-table[!table$YEAR<1994,]
+table<-table[!table$YEAR==2015,] # Strange reclassification of data.
+Inst_Carnegie_table<-table
+save(Inst_Carnegie_table, file="/Users/chadgevans/Dissertation/Projects/Build_Dataset/IPEDS/Cleaned_Data/Inst_Carnegie_table.RData")
+
 
