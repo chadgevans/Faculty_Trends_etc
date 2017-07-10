@@ -386,8 +386,9 @@ Contract_table %>%
   gather(FTSTATUS,COUNT,1:2) %>%
   ggplot(aes(x=CLASS, y=COUNT, fill=FTSTATUS)) + 
   geom_bar(stat="identity", position="dodge") +
-  scale_fill_discrete("",labels=c("Full-time", "Part-time")) +
-  labs(title = "Instructional Faculty Contracts in 2013", y = "Number of Instructors", caption = "Evans & Furstenberg. NCES IPEDS Finance Component (Delta Project) 2014.") +
+  scale_x_discrete(labels = c("Annual \n Contracts","Multi-year \n Contracts","Non-faculty or \n Non-tenure Inst.","Tenure/Track \n Contracts")) +
+  scale_fill_manual("", values = c("blue", "red"), labels=c("Full-time", "Part-time")) +
+  labs(title = "Instructional Faculty Contracts in 2013", y = "Number of Instructors", x="Faculty Class", caption = "Evans & Furstenberg. NCES IPEDS Finance Component (Delta Project) 2013.") +
   theme(panel.background = element_rect(fill = 'aliceblue', colour = 'black'))
 ```
 
@@ -398,6 +399,9 @@ In the following sections, we examine more closely the growth of non-tenure trac
 IPEDS shows that the percentage of non-tenure track faculty has increased in every institutional level (4-year, 2-year and less-than-2-year).  The most apparent growth is in less-than-two-year institutions.  In 2002, 70\% of faculty in these institutions were non-tenure track.  By 2007, tenured faculty had virtually disappeared from all less-than-two-year institutions. Two-year and four-year institutions have also experienced increases in their percentage of non-tenure track faculty members; albeit more moderate growth.  Just over 60\% percent of faculty in four-year institutions work under contingent contracts today.  Eighty percent of faculty in two-year schools are non-tenure track.
 
 ```{r PCT_NTT_by_Level, fig.cap="Percent Non-Tenure Track by Institutional Level"}
+
+
+
 attach(Level_Ten_table)
 mypalette<-brewer.pal(3, "Set1")
 par(mar=c(9,5,4,2), bg="oldlace")

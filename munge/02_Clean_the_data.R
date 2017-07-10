@@ -184,10 +184,29 @@ datalist<-lapply(file_list, function(x){read.table(x, header=TRUE, sep=",")})
 datalist <- lapply(datalist,function(x) {colnames(x) <- toupper(colnames(x));x})
 years <- list(2001:2015)
 data<-do.call("rbind.fill", mapply(cbind, datalist, YEAR = list(2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015), SIMPLIFY = FALSE))
-data1215<-data[data$YEAR %in% c(2012:2015),c("YEAR","EAPFT","EAPPT","EAPCAT")] # Splitting these two intervals is necessary b/c they're structured differently
-data0211<-data[data$YEAR %in% c(2002:2011),c("YEAR","EAPTOT","EAPRECTP")]
+data0211<-data[data$YEAR %in% c(2002:2011),c("YEAR","UNITID","EAPTOT","EAPRECTP")]
+data1215<-data[data$YEAR %in% c(2012:2015),c("YEAR","UNITID","EAPFT","EAPPT","EAPCAT")] # Splitting these two intervals is necessary b/c they're structured differently
+
+table<-data0211 %>%
+  select(YEAR,EAPTOT,EAPRECTP) %>%
+  filter(EAPRECTP %in% c(2102, 2103, 2104, 3102, 3103, 3104)) %>%
+  `colnames<-`(c("YEAR","EAPTOT","FACULTY"))
+table$FACULTY[table$FACULTY==2102]<-"FTTEN"
+table$FACULTY[table$FACULTY==2103]<-"FTTRACK"
+table$FACULTY[table$FACULTY==2104]<-"FTNTT"
+table$FACULTY[table$FACULTY==3102]<-"PTTEN"
+table$FACULTY[table$FACULTY==3103]<-"PTTRACK"
+table$FACULTY[table$FACULTY==3104]<-"PTNTT"
+table <- table %>%
+  group_by(YEAR, FACULTY) %>%
+  summarise(SUM=sum(EAPTOT)) %>%
+  spread(FACULTY, SUM) %>%
+  mutate(PT=PTNTT+PTTEN+PTTRACK) %>%
+  select(YEAR,FTNTT,FTTEN,FTTRACK,PT)
+Tenure_table0211<-table
 
 table<-data1215 %>%
+  select(YEAR,EAPFT,EAPPT,EAPCAT) %>%
   gather(CLASS, VALUE, 4) %>%
   filter(VALUE %in% c(10020,10030,10040))
 table$FACULTY[table$VALUE==10020]<-"TENURE" # With faculty status, tenured; "10020" means EAP number or FACSTAT number 20
@@ -205,27 +224,21 @@ table<-table %>%
   `colnames<-`(c("YEAR","FTNTT","FTTEN","FTTRACK","PT"))
 Tenure_table1215<-table
 
-table<-data0211 %>%
-  filter(EAPRECTP %in% c(2102, 2103, 2104, 3102, 3103, 3104)) %>%
-  `colnames<-`(c("YEAR","EAPTOT","FACULTY"))
-table$FACULTY[table$FACULTY==2102]<-"FTTEN"
-table$FACULTY[table$FACULTY==2103]<-"FTTRACK"
-table$FACULTY[table$FACULTY==2104]<-"FTNTT"
-table$FACULTY[table$FACULTY==3102]<-"PTTEN"
-table$FACULTY[table$FACULTY==3103]<-"PTTRACK"
-table$FACULTY[table$FACULTY==3104]<-"PTNTT"
-table <- table %>%
-  group_by(YEAR, FACULTY) %>%
-  summarise(SUM=sum(EAPTOT)) %>%
-  spread(FACULTY, SUM) %>%
-  mutate(PT=PTNTT+PTTEN+PTTRACK) %>%
-  select(YEAR,FTNTT,FTTEN,FTTRACK,PT)
-Tenure_table0211<-table
-
 Tenure_table<-rbind(Tenure_table0211,Tenure_table1215)
 Tenure_table$PT[12:14]<-c(600000,630000,660000) # Imputed Values
 
 
+# Now we merge with institutional level characteristics (as of 2014)
+Inst_data<-read_csv(file.path(Data, "CSV_262017-529.csv"))
+Inst_data %>%
+  `names<-`(c('UNITID','INST','YEAR','SECTOR','LEVEL','CONTROL','DEGREE','TITLEIV','INSTCAT','CARNEGIE','CARNENROLL','CARNSIZE','OCC','ACADEMIC','CONTPROF','REC','REMEDIAL','HIGH','UNDERGRADS','GRADS','SFRATIO')
+) %>%
+  select(UNITID,YEAR,LEVEL,CONTROL,DEGREE,CARNEGIE) %>%
+  full_join(,Ind_data)
+
+Inst_data$YEAR<-NULL
+mdata<-merge(Ind_data,Inst_data, by="UNITID")
+save(mdata, file="/Users/chadgevans/Dissertation/Projects/Build_Dataset/IPEDS/Cleaned_Data/merged_ind_inst_data.RData")
 
 
 
