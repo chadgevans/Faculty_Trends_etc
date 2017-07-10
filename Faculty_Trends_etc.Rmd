@@ -361,34 +361,18 @@ Tenure_Sector_table %>%
 
 
 
-```{r IPEDS_Tenure_Pct_over_Time, fig.cap="Percentage of Faculty Types in Postsecondary Education (IPEDS)"}
-
-b %>%
-  ggplot(aes(x=YEAR, y=SUM, group=FACULTY_STATUS, colour=FACULTY_STATUS)) +
+```{r IPEDS_Facclass_Pct_over_Time, fig.cap="Percentage of Faculty Types in Postsecondary Education (IPEDS)"}
+Tenure_table[-1]<-prop.table(as.matrix(Tenure_table[2:5]),1)
+Tenure_table[-1]<-100*Tenure_table[-1]
+Tenure_table %>%
+  gather(STATUS, PCT, 2:5) %>%
+  ggplot(aes(x=YEAR, y=PCT, group=STATUS, colour=STATUS)) +
   geom_line() +
   geom_line(size=1) +
-  scale_color_discrete("Institutional Sector", labels = c("For-profit", "Non-Profit 2-Year", "Non-profit 4-Year", "Public 2-Year", "Public 4-Year")) +
-  labs(title="Percent of Full-time Faculty with Tenure, by Sector", subtitle= "1993-2015", x="Year", y = "Percent of Full-time Faculty") +
+  scale_color_discrete("Institutional Sector", labels = c('Full-time Non-Tenure/Track','Full-time Tenured','Full-time Tenure-Track','Part-time Faculty')) +
+  labs(title="Percentage of Faculty Types in Postsecondary Education", subtitle= "2002-2015", x="Year", y = "Percent of Faculty") +
   theme(axis.text=element_text(size=10), axis.title=element_text(size=10), legend.text=element_text(size=10), legend.title=element_text(size=10)) +
-  labs(caption = "Evans & Furstenberg. NCES IPEDS Survey of Institutional Characteristics 1993-2015.")
-
-
-
-options(digits = 3,scipen=999) # turn off Scientific Notation
-mypalette<-brewer.pal(4, "Set2")
-# Tenure_table[11:14,"PT"]<-c(45.7, 45.6, 45.6, 45.2) # add 3
-# Tenure_table[11:14,"FTNTT"]<-c(21.5, 21.2, 21.4, 21.7) # subtract 3
-attach(Tenure_table)
-par(mar=c(9,5,4,2), bg="oldlace")
-plot(YEAR,FTTEN, ylab="Percent of Faculty",xlab="Year",main="Percentage of Faculty Types in Postsecondary Education", type="l",ylim=c(0,65), col=mypalette[1],lwd=2)
-points(YEAR,FTTRACK, type="l",col=mypalette[2],lwd=2)
-points(YEAR,FTNTT, type="l",col=mypalette[3],lwd=2)
-points(YEAR,PT, type="l",col=mypalette[4],lwd=2)
-legend(2002,65,c('Full-time Tenured','Full-time Tenure-Track', 'Full-time Non-Tenure/Track','Part-time Faculty'),lty=c(1,1,1,1), lwd=c(2.5,2.5,2.5,2.5),col=mypalette, cex=.9, bg="white")
-mtext("Evans & Furstenberg",side=1,line=3,adj=0,cex=.7,col="black")
-mtext("Source: U.S. Department of Education, National Center for Education Statistics, Integrated \n Postsecondary Education Data System (IPEDS).  Survey of Employees by faculty status, primary \n function/occupational activity: 2002-2015.",side=1,line=5.5,adj=0,cex=.7,col="black")
-mtext("Note: All U.S.-based, postsecondary employees with faculty status in every field.",side=1,line=6.5,adj=0,cex=.7,col="black")
-detach(Tenure_table)
+  labs(caption = "Evans & Furstenberg. NCES IPEDS Survey of Employees by Assigned Position (EAP), primary function/occupational activity 2002-2015.")
 ```
 
 Figure 10 shows two general patterns over time.  First, part-time work is on the rise in academia.  This has been a well-recognized pattern since as early as the 1970s.  However, the trend has also carried over well into the twenty-first century.  In the figure, we see that the proportion of part-time faculty increased from 41.5\% in 2002 to 42.2\% in 2014.  Admittedly, this is a small difference.  However, changes made to the 2012 instruemnt (and after) probably mitigated the true growth of part-time labor during this period.  Up until 2012, the proportion of part-time faculty was clearly climbing.  In fact, 47\% of faculty were part-time in 2011, just before the survey was changed.  As a result, we believe that the trend may be stronger than indicated in the figure.
@@ -398,16 +382,13 @@ Secondly, the proportion of non-tenure track faculty is clearly increasing.  63\
 Contracts of non-tenure track faculty take different forms.  Some non-tenure track faculty hold multi-year contracts, which may give them the sense of permanence or belonging in their institutions.  However, multi-year contracts are rare.  Most adjuncts work under contracts renewed on an annual basis.  This is true for full-time adjuncts and part-time adjuncts.
 
 ```{r Faculty_Contracts_2013, fig.cap="Faculty Contracts in 2013"}
-attach(FTPTdf)
-par(bg = "oldlace")
-par(mar=c(8,5,4,2), bg="oldlace")
-rownames(FTPTdf)<-c("Tenure/Track \n Contracts","Multi-year \n Contracts","Annual \n Contracts","Non-faculty or \n Non-tenure Inst.")
-barplot(t(as.matrix(FTPTdf)), beside=T, col=c("blue","red"), ylab="Number of Instructors", main="Instructional Faculty Contracts in 2013")
-legend("topright",c("Full-time","Part-time"),pch=15,col=c('blue','red'), cex=1, bg="white")
-mtext("Evans & Furstenberg",side=1,line=3,adj=0,cex=.7,col="black")
-mtext("Source: U.S. Department of Education, National Center for Education Statistics, Integrated \n Postsecondary Education Data System (IPEDS) 2013.",side=1,line=4.5,adj=0,cex=.7,col="black")
-mtext("Note: Instructional faculty only.",side=1,line=5.5,adj=0,cex=.7,col="black")
-detach(FTPTdf)
+Contract_table %>% 
+  gather(FTSTATUS,COUNT,1:2) %>%
+  ggplot(aes(x=CLASS, y=COUNT, fill=FTSTATUS)) + 
+  geom_bar(stat="identity", position="dodge") +
+  scale_fill_discrete("",labels=c("Full-time", "Part-time")) +
+  labs(title = "Instructional Faculty Contracts in 2013", y = "Number of Instructors", caption = "Evans & Furstenberg. NCES IPEDS Finance Component (Delta Project) 2014.") +
+  theme(panel.background = element_rect(fill = 'aliceblue', colour = 'black'))
 ```
 
 In the following sections, we examine more closely the growth of non-tenure track faculty across important aspects of postsecondary institutions.  Specifically, we examine the distribution of adjuncts in institutions based on their level, control, degree-granting status and Carnegie classification.  We also look at the role of tenure status in administration and clinical/medical positions.  We then turn to other datasets (SDR and HERI) that allow us to examine other important relationships.

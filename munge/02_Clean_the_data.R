@@ -25,23 +25,6 @@ ttable$CONTROL<-c(rep("All", 53), rep("Public",53), rep("Private", 53), rep("Non
 tuition_table<-ttable
 rm(ttable)
 
-# Delta Project Institutional Expenses
-#https://nces.ed.gov/ipeds/deltacostproject/
-keeperCols <- c("academicyear","acadsupp01","auxiliary01","hospital01","independ01","instsupp01","instruction01","pubserv01","research01","opermain01", "grants01", "other01", "studserv01")
-df1<-read.csv(file.path(Data, "delta_public_release_00_13.csv"))
-df2<-read.csv(file.path(Data, "delta_public_release_87_99.csv"))
-etable <- do.call("rbind.fill", list(df1[keeperCols],df2[keeperCols]))
-etable[ is.na(etable) ] <- NA
-etable<- etable %>% 
-  mutate_if(is.character, as.double) %>%
-  group_by(academicyear) %>% 
-  summarise_each(funs(sum(., na.rm=T))) %>%
-  mutate(NetAid_Other=opermain01+grants01+other01) %>%
-  select(-c(opermain01,grants01,other01)) %>% 
-  mutate_each(funs(./1000000000), -academicyear)
-Delta_table<-etable
-rm(etable)
-
 # IPEDS Expenses by Category 2014
 # https://nces.ed.gov/ipeds/trendgenerator
 publicex<-read_csv(file.path(Data, "Report_Public.csv"), skip=1, n_max = 11)
@@ -65,7 +48,37 @@ table<-table[rowSums(is.na(table))!=15,]
 table$UNIT<-as.factor(c(rep("INST",9), rep("FACULTY",9)))
 Tenure_Sector_table<-table
 
+##########################################################################
+# Delta Project Data
+#https://nces.ed.gov/ipeds/deltacostproject/
+##########################################################################
+# Delta Project Institutional Expenses
+keeperCols <- c("academicyear","acadsupp01","auxiliary01","hospital01","independ01","instsupp01","instruction01","pubserv01","research01","opermain01", "grants01", "other01", "studserv01")
+df1<-read.csv(file.path(Data, "delta_public_release_00_13.csv"))
+df2<-read.csv(file.path(Data, "delta_public_release_87_99.csv"))
+etable <- do.call("rbind.fill", list(df1[keeperCols],df2[keeperCols]))
+etable[ is.na(etable) ] <- NA
+etable<- etable %>% 
+  mutate_if(is.character, as.double) %>%
+  group_by(academicyear) %>% 
+  summarise_each(funs(sum(., na.rm=T))) %>%
+  mutate(NetAid_Other=opermain01+grants01+other01) %>%
+  select(-c(opermain01,grants01,other01)) %>% 
+  mutate_each(funs(./1000000000), -academicyear)
+Delta_table<-etable
+rm(etable)
 
+# Delta Project Instructional Faculty Contracts
+table<-df1 %>% 
+  select(FT_tenure_T1, FT_tenure_T2, FT_tenure_T3, FT_tenure_T4, PT_tenure_T1, PT_tenure_T2, PT_tenure_T3, PT_tenure_T4) %>%
+  summarise_each(funs(sum(., na.rm=T))) %>% 
+  as.matrix() # Only 2013 available, thus YEAR is unnecessary
+dim(table)<-c(4,2)
+table<-table %>%
+  as.data.frame() %>%
+  mutate(CLASS=c("TTT", "NTT_MY","NTT_A","NTT_NONFAC")) %>%
+  `colnames<-`(c("Fulltime", "Parttime", "CLASS"))
+Contract_table<-table
 ##########################################################################
 # IPEDS Custom Data (Institutional Data) 
 ##########################################################################
@@ -190,8 +203,7 @@ table<-table %>%
   mutate(PT=NONTENURE_EAPPT+TENURE_EAPPT+TRACK_EAPPT) %>%
   select(YEAR,NONTENURE_EAPFT,TENURE_EAPFT,TRACK_EAPFT,PT) %>%
   `colnames<-`(c("YEAR","FTNTT","FTTEN","FTTRACK","PT"))
-Tenure_table<-table
-Tenure_table[-1]<-prop.table(as.matrix(Tenure_table[2:5]),1)
+Tenure_table1215<-table
 
 table<-data0211 %>%
   filter(EAPRECTP %in% c(2102, 2103, 2104, 3102, 3103, 3104)) %>%
@@ -207,19 +219,12 @@ table <- table %>%
   summarise(SUM=sum(EAPTOT)) %>%
   spread(FACULTY, SUM) %>%
   mutate(PT=PTNTT+PTTEN+PTTRACK) %>%
-  select(YEAR,FTNTT,FTTEN,FTTRACK,PT) %>%
-Tenure_table<-table
-Tenure_table[-1]<-prop.table(as.matrix(Tenure_table[2:5]),1)
-  
+  select(YEAR,FTNTT,FTTEN,FTTRACK,PT)
+Tenure_table0211<-table
 
-Aggregated_table_0211 <- dcast(table0211, YEAR ~ FACULTY, value.var = "EAPTOT", fun.aggregate=sum)
+Tenure_table<-rbind(Tenure_table0211,Tenure_table1215)
+Tenure_table$PT[12:14]<-c(600000,630000,660000) # Imputed Values
 
-Tenure_table<-rbind(Aggregated_table_0211,Aggregated_table_1215)
-Tenure_table$PT<-apply(Tenure_table[,5:7], 1, sum)
-Tenure_table<-subset(Tenure_table, select = -c(PTNTT,PTTEN,PTTRACK)) # Remove to have FT tenure and FT track separate
-Tenure_table[-1]<-prop.table(as.matrix(Tenure_table[2:5]),1)
-Tenure_table[-1]<-100*Tenure_table[-1]
-save(Tenure_table, file="/Users/chadgevans/Dissertation/Projects/Build_Dataset/IPEDS/Cleaned_Data/Tenure_table.RData")
 
 
 
