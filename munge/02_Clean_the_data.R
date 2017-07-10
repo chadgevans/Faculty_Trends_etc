@@ -171,7 +171,6 @@ datalist<-lapply(file_list, function(x){read.table(x, header=TRUE, sep=",")})
 datalist <- lapply(datalist,function(x) {colnames(x) <- toupper(colnames(x));x})
 years <- list(2001:2015)
 data<-do.call("rbind.fill", mapply(cbind, datalist, YEAR = list(2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015), SIMPLIFY = FALSE))
-
 data1215<-data[data$YEAR %in% c(2012:2015),c("YEAR","EAPFT","EAPPT","EAPCAT")] # Splitting these two intervals is necessary b/c they're structured differently
 data0211<-data[data$YEAR %in% c(2002:2011),c("YEAR","EAPTOT","EAPRECTP")]
 
@@ -181,32 +180,38 @@ table<-data1215 %>%
 table$FACULTY[table$VALUE==10020]<-"TENURE" # With faculty status, tenured; "10020" means EAP number or FACSTAT number 20
 table$FACULTY[table$VALUE==10030]<-"TRACK" # With faculty status, on tenure track
 table$FACULTY[table$VALUE==10040]<-"NONTENURE" # With faculty status not on tenure track/No tenure system, total
-b<-table %>%
+table<-table %>%
   select(YEAR,EAPFT,EAPPT, FACULTY) %>%
   gather(STATUS, VALUE, -YEAR, -FACULTY) %>%
   group_by(YEAR, FACULTY, STATUS) %>%
   summarise(SUM=sum(VALUE)) %>%
   unite(FACULTY_STATUS,FACULTY,STATUS) %>%
-  spread(FACULTY_STATUS, SUM) 
+  spread(FACULTY_STATUS, SUM) %>%
+  mutate(PT=NONTENURE_EAPPT+TENURE_EAPPT+TRACK_EAPPT) %>%
+  select(YEAR,NONTENURE_EAPFT,TENURE_EAPFT,TRACK_EAPFT,PT) %>%
+  `colnames<-`(c("YEAR","FTNTT","FTTEN","FTTRACK","PT"))
+Tenure_table<-table
+Tenure_table[-1]<-prop.table(as.matrix(Tenure_table[2:5]),1)
 
-mutate(FACULTY_STATUS=as.factor(FACULTY_STATUS)) %>%
+table<-data0211 %>%
+  filter(EAPRECTP %in% c(2102, 2103, 2104, 3102, 3103, 3104)) %>%
+  `colnames<-`(c("YEAR","EAPTOT","FACULTY"))
+table$FACULTY[table$FACULTY==2102]<-"FTTEN"
+table$FACULTY[table$FACULTY==2103]<-"FTTRACK"
+table$FACULTY[table$FACULTY==2104]<-"FTNTT"
+table$FACULTY[table$FACULTY==3102]<-"PTTEN"
+table$FACULTY[table$FACULTY==3103]<-"PTTRACK"
+table$FACULTY[table$FACULTY==3104]<-"PTNTT"
+table <- table %>%
+  group_by(YEAR, FACULTY) %>%
+  summarise(SUM=sum(EAPTOT)) %>%
+  spread(FACULTY, SUM) %>%
+  mutate(PT=PTNTT+PTTEN+PTTRACK) %>%
+  select(YEAR,FTNTT,FTTEN,FTTRACK,PT) %>%
+Tenure_table<-table
+Tenure_table[-1]<-prop.table(as.matrix(Tenure_table[2:5]),1)
   
 
-Aggregated_FTtable <- dcast(table, YEAR ~ FACULTY, value.var = "EAPFT", fun.aggregate=sum, na.rm=T)
-names(Aggregated_FTtable)<-c("YEAR","FTNTT","FTTEN","FTTRACK")
-Aggregated_PTtable <- dcast(table1215, YEAR ~ FACULTY, value.var = "EAPPT", fun.aggregate=sum, na.rm=T)
-names(Aggregated_PTtable)<-c("YEAR","PTNTT","PTTEN","PTTRACK")
-Aggregated_table_1215<-merge(Aggregated_FTtable,Aggregated_PTtable)
-
-table <- melt(data0211, id.vars = c("YEAR","EAPTOT"))
-table<-table[table$value %in% c(2102, 2103, 2104, 3102, 3103, 3104),]
-table$FACULTY[table$value==2102]<-"FTTEN"
-table$FACULTY[table$value==2103]<-"FTTRACK"
-table$FACULTY[table$value==2104]<-"FTNTT"
-table$FACULTY[table$value==3102]<-"PTTEN"
-table$FACULTY[table$value==3103]<-"PTTRACK"
-table$FACULTY[table$value==3104]<-"PTNTT"
-table0211<-subset(table, select = -c(variable,value))
 Aggregated_table_0211 <- dcast(table0211, YEAR ~ FACULTY, value.var = "EAPTOT", fun.aggregate=sum)
 
 Tenure_table<-rbind(Aggregated_table_0211,Aggregated_table_1215)
