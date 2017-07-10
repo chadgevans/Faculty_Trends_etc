@@ -1,4 +1,6 @@
-# NCES Tables
+##########################################################################
+# NCES Tables 
+##########################################################################
 # https://nces.ed.gov/programs/digest/d16/tables/dt16_303.10.asp?current=yes
 EnrollTab<-read_csv(file.path(Data, "tabn303.10.csv"), skip = 5, na = c("---",""))
 EnrollTab<-EnrollTab[rowSums(is.na(EnrollTab))!=14,-c(5,13)]
@@ -53,6 +55,17 @@ expensedata<- expensedata %>%
   mutate(ALL=PUBLIC+PRIVATE) %>%
   mutate_each(funs(.*1000/1000000000), -EXPENSE)  # adjusted for 1000s, converted to billions
 
+# IPEDS
+#Percentage of degree-granting postsecondary institutions with a tenure system and of full-time faculty with tenure at these institutions, by control and level of institution and selected characteristics of faculty: Selected years, 1993-94 through 2015-16
+# https://nces.ed.gov/programs/digest/d14/tables/dt14_316.80.asp
+table<-read_csv(file.path(Data, "tabn316.80.csv"), skip=6, na=c("---", "","‡", "†"), n_max = 25)
+names(table)<-c("YEAR","ALLINST","PUBTOTAL","PUB4YRTOTAL","PUB4YRDOC","PUB4YRMA","PUB4YROTH","PUB2YR","NONPROFTOTAL","NONPROF4YRTOTAL","NONPROF4YRDOC","NONPROF4YRMA","NONPROF4YROTH","NONPROF2YR","FORPROF")
+table$YEAR<-as.numeric(gsub("([0-9]+).*$", "\\1", table$YEAR))
+table<-table[rowSums(is.na(table))!=15,]
+table$UNIT<-as.factor(c(rep("INST",9), rep("FACULTY",9)))
+Tenure_Sector_table<-table
+
+
 ##########################################################################
 # IPEDS Custom Data (Institutional Data) 
 ##########################################################################
@@ -99,7 +112,6 @@ data$CONTROL<-as.factor(data$CONTROL)
 levels(data$CONTROL)<-c(NA,NA,NA,"Public","Private non-profit","Private for-profit", NA,NA,NA,NA,NA,"Private for-profit","Private for-profit","Private non-profit","Private non-profit",NA,"Private for-profit","Private non-profit","Private non-profit",NA,"Public","Public","Public","Private non-profit") # Last two NA's were because of "only private" 
 levels(data$DEGREE)<-c(NA, "Degree","NonDegree",NA,"NonDegree","NonDegree","NonDegree","Degree","Degree","Degree","Degree","Degree","NonDegree","Degree","Degree","Degree","Degree","Degree",NA,"Degree","Degree","Degree","Degree","NonDegree","Degree",NA,NA,"Degree","Degree",NA,"Degree", "NonDegree","NonDegree","NonDegree",NA)
 levels(data$CARNEGIE)<-c(NA,rep("ASSOCS",14),rep("BAS",3),"RESDOC",rep("MASTERS",3),"SPECIAL", NA, rep("SPECIAL",3),"RESDOC","RESDOC",rep("SPECIAL",5),"TRIBAL",NA,rep("SPECIAL",9),NA,"ASSOCS",rep("BAS",3),rep("RESDOC",2),rep("MASTERS",2),rep("SPECIAL",5),"TRIBAL","ASSOCS",rep("BAS",2), rep("RESDOC",2), rep("MASTERS",2), "SPECIAL",NA,"SPECIAL","RESDOC","RESDOC", "SPECIAL",rep("ASSOCS",9),rep("BAS",4),rep("RESDOC",3),rep("MASTERS",3),rep("SPECIAL",13),NA,"ASSOCS","BAS",rep("RESDOC",2),rep("MASTERS",2),"SPECIAL","TRIBAL",NA,"ASSOCS",rep("BAS",2), rep("RESDOC",2), rep("MASTERS",2),rep("RESDOC",2), "ASSOCS","BAS",rep("MASTERS",2),rep("SPECIAL",2)) 
-
 # Level
 table <- data %>% 
   select(YEAR,LEVEL) %>%
@@ -148,17 +160,61 @@ table<-data %>%
   na.omit()
 Delta_Crosstable<-table
 
-# IPEDS
-#Percentage of degree-granting postsecondary institutions with a tenure system and of full-time faculty with tenure at these institutions, by control and level of institution and selected characteristics of faculty: Selected years, 1993-94 through 2015-16
-# https://nces.ed.gov/programs/digest/d14/tables/dt14_316.80.asp
-table<-read_csv(file.path(Data, "tabn316.80.csv"), skip=6, na=c("---", "","‡", "†"), n_max = 25)
-names(table)<-c("YEAR","ALLINST","PUBTOTAL","PUB4YRTOTAL","PUB4YRDOC","PUB4YRMA","PUB4YROTH","PUB2YR","NONPROFTOTAL","NONPROF4YRTOTAL","NONPROF4YRDOC","NONPROF4YRMA","NONPROF4YROTH","NONPROF2YR","FORPROF")
-table$YEAR<-as.numeric(gsub("([0-9]+).*$", "\\1", table$YEAR))
-table<-table[rowSums(is.na(table))!=15,]
-table$UNIT<-as.factor(c(rep("INST",9), rep("FACULTY",9)))
-Tenure_table<-table
 
 
+##########################################################################
+# IPEDS Complete Data (Employees by Assigned Position (EAP)) 
+##########################################################################
+setwd("/Users/chadgevans/Research/Projects/Data/Faculty_Trends_etc_data/Complete_Data_Files/EAP_Data")
+file_list <- list.files()
+datalist<-lapply(file_list, function(x){read.table(x, header=TRUE, sep=",")})
+datalist <- lapply(datalist,function(x) {colnames(x) <- toupper(colnames(x));x})
+years <- list(2001:2015)
+data<-do.call("rbind.fill", mapply(cbind, datalist, YEAR = list(2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015), SIMPLIFY = FALSE))
+
+data1215<-data[data$YEAR %in% c(2012:2015),c("YEAR","EAPFT","EAPPT","EAPCAT")] # Splitting these two intervals is necessary b/c they're structured differently
+data0211<-data[data$YEAR %in% c(2002:2011),c("YEAR","EAPTOT","EAPRECTP")]
+
+table<-data1215 %>%
+  gather(CLASS, VALUE, 4) %>%
+  filter(VALUE %in% c(10020,10030,10040))
+table$FACULTY[table$VALUE==10020]<-"TENURE" # With faculty status, tenured; "10020" means EAP number or FACSTAT number 20
+table$FACULTY[table$VALUE==10030]<-"TRACK" # With faculty status, on tenure track
+table$FACULTY[table$VALUE==10040]<-"NONTENURE" # With faculty status not on tenure track/No tenure system, total
+b<-table %>%
+  select(YEAR,EAPFT,EAPPT, FACULTY) %>%
+  gather(STATUS, VALUE, -YEAR, -FACULTY) %>%
+  group_by(YEAR, FACULTY, STATUS) %>%
+  summarise(SUM=sum(VALUE)) %>%
+  unite(FACULTY_STATUS,FACULTY,STATUS) %>%
+  spread(FACULTY_STATUS, SUM) 
+
+mutate(FACULTY_STATUS=as.factor(FACULTY_STATUS)) %>%
+  
+
+Aggregated_FTtable <- dcast(table, YEAR ~ FACULTY, value.var = "EAPFT", fun.aggregate=sum, na.rm=T)
+names(Aggregated_FTtable)<-c("YEAR","FTNTT","FTTEN","FTTRACK")
+Aggregated_PTtable <- dcast(table1215, YEAR ~ FACULTY, value.var = "EAPPT", fun.aggregate=sum, na.rm=T)
+names(Aggregated_PTtable)<-c("YEAR","PTNTT","PTTEN","PTTRACK")
+Aggregated_table_1215<-merge(Aggregated_FTtable,Aggregated_PTtable)
+
+table <- melt(data0211, id.vars = c("YEAR","EAPTOT"))
+table<-table[table$value %in% c(2102, 2103, 2104, 3102, 3103, 3104),]
+table$FACULTY[table$value==2102]<-"FTTEN"
+table$FACULTY[table$value==2103]<-"FTTRACK"
+table$FACULTY[table$value==2104]<-"FTNTT"
+table$FACULTY[table$value==3102]<-"PTTEN"
+table$FACULTY[table$value==3103]<-"PTTRACK"
+table$FACULTY[table$value==3104]<-"PTNTT"
+table0211<-subset(table, select = -c(variable,value))
+Aggregated_table_0211 <- dcast(table0211, YEAR ~ FACULTY, value.var = "EAPTOT", fun.aggregate=sum)
+
+Tenure_table<-rbind(Aggregated_table_0211,Aggregated_table_1215)
+Tenure_table$PT<-apply(Tenure_table[,5:7], 1, sum)
+Tenure_table<-subset(Tenure_table, select = -c(PTNTT,PTTEN,PTTRACK)) # Remove to have FT tenure and FT track separate
+Tenure_table[-1]<-prop.table(as.matrix(Tenure_table[2:5]),1)
+Tenure_table[-1]<-100*Tenure_table[-1]
+save(Tenure_table, file="/Users/chadgevans/Dissertation/Projects/Build_Dataset/IPEDS/Cleaned_Data/Tenure_table.RData")
 
 
 

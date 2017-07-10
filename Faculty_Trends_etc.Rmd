@@ -344,8 +344,8 @@ One controversial way for colleges and universities to reduce costs has been to 
 
 To begin with, we examine the proportion of non-tenure track faculty across all institutions in the United States.  We also factor in the full-time or part-time status of adjuncts, as this is known to be important to the tenure system.  Before interpreting Figure 10, however, it is important to consider the improbable dip or shift occuring between 2011 and 2012 in this graph.  It is unclear why such a pattern came about, however, it might be related to a major change made in how occupations were classified since 2012.  The Department of Education made these changes in order to align the Human Resources component of IPEDS with the 2010 Standard Occupational Classification (SOC) System.  In the following paragraphs, we will try to identify patterns as best we can.
 
-```{r IPEDS_Tenure_Pct_over_Time, fig.cap="Percentage of Faculty Types in Postsecondary Education (IPEDS)"}
-Tenure_table %>%
+```{r IPEDS_Tenure_Pct_over_Time, fig.cap="Percentage Tenured Faculty in Postsecondary Education (IPEDS)"}
+Tenure_Sector_table %>%
   filter(UNIT=='FACULTY') %>% 
   gather(TENURE, PCT, 2:15) %>% 
   filter(TENURE %in% c("FORPROF","PUB4YRTOTAL","PUB2YR","NONPROF4YRTOTAL","NONPROF2YR")) %>%
@@ -353,10 +353,26 @@ Tenure_table %>%
   geom_line() +
   geom_line(size=1) +
   scale_color_discrete("Institutional Sector", labels = c("For-profit", "Non-Profit 2-Year", "Non-profit 4-Year", "Public 2-Year", "Public 4-Year")) +
-  labs(title="Percent of Institutions with Tenure Systems, by Sector", subtitle= "1993-2015", x="Year", y = "Percent of Institutions") +
+  labs(title="Percent of Full-time Faculty with Tenure, by Sector", subtitle= "1993-2015", x="Year", y = "Percent of Full-time Faculty") +
   theme(axis.text=element_text(size=10), axis.title=element_text(size=10), legend.text=element_text(size=10), legend.title=element_text(size=10)) +
   labs(caption = "Evans & Furstenberg. NCES IPEDS Survey of Institutional Characteristics 1993-2015.")
 ```
+
+
+
+
+```{r IPEDS_Tenure_Pct_over_Time, fig.cap="Percentage of Faculty Types in Postsecondary Education (IPEDS)"}
+
+b %>%
+  ggplot(aes(x=YEAR, y=SUM, group=FACULTY_STATUS, colour=FACULTY_STATUS)) +
+  geom_line() +
+  geom_line(size=1) +
+  scale_color_discrete("Institutional Sector", labels = c("For-profit", "Non-Profit 2-Year", "Non-profit 4-Year", "Public 2-Year", "Public 4-Year")) +
+  labs(title="Percent of Full-time Faculty with Tenure, by Sector", subtitle= "1993-2015", x="Year", y = "Percent of Full-time Faculty") +
+  theme(axis.text=element_text(size=10), axis.title=element_text(size=10), legend.text=element_text(size=10), legend.title=element_text(size=10)) +
+  labs(caption = "Evans & Furstenberg. NCES IPEDS Survey of Institutional Characteristics 1993-2015.")
+
+
 
 options(digits = 3,scipen=999) # turn off Scientific Notation
 mypalette<-brewer.pal(4, "Set2")
