@@ -188,9 +188,8 @@ data0211<-data[data$YEAR %in% c(2002:2011),c("YEAR","UNITID","EAPTOT","EAPRECTP"
 data1215<-data[data$YEAR %in% c(2012:2015),c("YEAR","UNITID","EAPFT","EAPPT","EAPCAT")] # Splitting these two intervals is necessary b/c they're structured differently
 
 table<-data0211 %>%
-  select(YEAR,EAPTOT,EAPRECTP) %>%
   filter(EAPRECTP %in% c(2102, 2103, 2104, 3102, 3103, 3104)) %>%
-  `colnames<-`(c("YEAR","EAPTOT","FACULTY"))
+  `colnames<-`(c("YEAR","UNITID","EAPTOT","FACULTY"))
 table$FACULTY[table$FACULTY==2102]<-"FTTEN"
 table$FACULTY[table$FACULTY==2103]<-"FTTRACK"
 table$FACULTY[table$FACULTY==2104]<-"FTNTT"
@@ -198,50 +197,65 @@ table$FACULTY[table$FACULTY==3102]<-"PTTEN"
 table$FACULTY[table$FACULTY==3103]<-"PTTRACK"
 table$FACULTY[table$FACULTY==3104]<-"PTNTT"
 table <- table %>%
-  group_by(YEAR, FACULTY) %>%
-  summarise(SUM=sum(EAPTOT)) %>%
-  spread(FACULTY, SUM) %>%
-  mutate(PT=PTNTT+PTTEN+PTTRACK) %>%
-  select(YEAR,FTNTT,FTTEN,FTTRACK,PT)
+  spread(FACULTY, EAPTOT) %>%
+  rowwise() %>% 
+  mutate(PT=sum(PTNTT,PTTEN,PTTRACK, na.rm=T)) %>%
+  select(YEAR,UNITID,FTNTT,FTTEN,FTTRACK,PT) 
 Tenure_table0211<-table
 
 table<-data1215 %>%
-  select(YEAR,EAPFT,EAPPT,EAPCAT) %>%
-  gather(CLASS, VALUE, 4) %>%
+  select(YEAR,UNITID,EAPFT,EAPPT,EAPCAT) %>%
+  gather(CLASS, VALUE, 5) %>%
   filter(VALUE %in% c(10020,10030,10040))
 table$FACULTY[table$VALUE==10020]<-"TENURE" # With faculty status, tenured; "10020" means EAP number or FACSTAT number 20
 table$FACULTY[table$VALUE==10030]<-"TRACK" # With faculty status, on tenure track
 table$FACULTY[table$VALUE==10040]<-"NONTENURE" # With faculty status not on tenure track/No tenure system, total
 table<-table %>%
-  select(YEAR,EAPFT,EAPPT, FACULTY) %>%
-  gather(STATUS, VALUE, -YEAR, -FACULTY) %>%
-  group_by(YEAR, FACULTY, STATUS) %>%
-  summarise(SUM=sum(VALUE)) %>%
+  select(YEAR,UNITID,EAPFT,EAPPT, FACULTY) %>%
+  gather(STATUS, VALUE, -YEAR, -UNITID, -FACULTY) %>%
   unite(FACULTY_STATUS,FACULTY,STATUS) %>%
-  spread(FACULTY_STATUS, SUM) %>%
-  mutate(PT=NONTENURE_EAPPT+TENURE_EAPPT+TRACK_EAPPT) %>%
-  select(YEAR,NONTENURE_EAPFT,TENURE_EAPFT,TRACK_EAPFT,PT) %>%
-  `colnames<-`(c("YEAR","FTNTT","FTTEN","FTTRACK","PT"))
+  spread(FACULTY_STATUS, VALUE) %>%
+  rowwise() %>% 
+  mutate(PT=sum(NONTENURE_EAPPT,TENURE_EAPPT,TRACK_EAPPT,na.rm=T)) %>%
+  select(YEAR,UNITID,NONTENURE_EAPFT,TENURE_EAPFT,TRACK_EAPFT,PT) %>%
+  `colnames<-`(c("YEAR","UNITID","FTNTT","FTTEN","FTTRACK","PT"))
 Tenure_table1215<-table
 
-Tenure_table<-rbind(Tenure_table0211,Tenure_table1215)
-Tenure_table$PT[12:14]<-c(600000,630000,660000) # Imputed Values
-
+Ind_Tenure_data<-rbind(Tenure_table0211,Tenure_table1215)
+table<- Ind_Tenure_data %>%
+  gather(STATUS, VALUE, -YEAR, -UNITID) %>%
+  group_by(YEAR, STATUS) %>%
+  summarise(SUM=sum(VALUE, na.rm = T)) %>%
+  spread(STATUS,SUM)
+table[-1]<-prop.table(as.matrix(table[2:5]),1)
+table[-1]<-100*table[-1]
+Tenure_Status_table<-table
 
 # Now we merge with institutional level characteristics (as of 2014)
 Inst_data<-read_csv(file.path(Data, "CSV_262017-529.csv"))
-Inst_data %>%
-  `names<-`(c('UNITID','INST','YEAR','SECTOR','LEVEL','CONTROL','DEGREE','TITLEIV','INSTCAT','CARNEGIE','CARNENROLL','CARNSIZE','OCC','ACADEMIC','CONTPROF','REC','REMEDIAL','HIGH','UNDERGRADS','GRADS','SFRATIO')
-) %>%
-  select(UNITID,YEAR,LEVEL,CONTROL,DEGREE,CARNEGIE) %>%
-  full_join(,Ind_data)
-
-Inst_data$YEAR<-NULL
-mdata<-merge(Ind_data,Inst_data, by="UNITID")
-save(mdata, file="/Users/chadgevans/Dissertation/Projects/Build_Dataset/IPEDS/Cleaned_Data/merged_ind_inst_data.RData")
-
-
-
-
-
+Inst_data<- Inst_data %>%
+  `names<-`(c('UNITID','INST','YEAR','SECTOR','LEVEL','CONTROL','DEGREE',
+              'TITLEIV','INSTCAT','CARNEGIE','CARNENROLL','CARNSIZE','OCC',
+              'ACADEMIC','CONTPROF','REC','REMEDIAL','HIGH','UNDERGRADS','GRADS','SFRATIO')) %>%
+  select(UNITID,LEVEL,CONTROL,DEGREE,CARNEGIE)
+Inst_data<-Inst_data[rowSums(is.na(Inst_data))!=4,]
+mdata<-inner_join(Inst_data,Ind_Tenure_data, by='UNITID') # keep all the rows of the Ind data and match the Inst-level characterstis with the ind data.
+# Level
+table<-mdata %>% 
+  group_by(LEVEL,YEAR) %>% 
+  summarize(NONTENURE=sum(FTNTT,PT, na.rm=T),TENURE=sum(FTTEN,FTTRACK, na.rm=T)) %>%
+  mutate(PCTNTT=(NONTENURE/(NONTENURE+TENURE)))
+Level_Ten_table<-table
+# Control
+table<-mdata %>% 
+  group_by(CONTROL,YEAR) %>% 
+  summarize(NONTENURE=sum(FTNTT,PT, na.rm=T),TENURE=sum(FTTEN,FTTRACK, na.rm=T)) %>%
+  mutate(PCTNTT=(NONTENURE/(NONTENURE+TENURE)))
+Inst_Control_Ten_table<-table
+# Degree-granting x tenure status table
+table<-mdata %>% 
+  group_by(DEGREE,YEAR) %>% 
+  summarize(NONTENURE=sum(FTNTT,PT, na.rm=T),TENURE=sum(FTTEN,FTTRACK, na.rm=T)) %>%
+  mutate(PCTNTT=(NONTENURE/(NONTENURE+TENURE)))
+Degree_Inst_Ten_table<-table
 

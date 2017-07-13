@@ -362,9 +362,7 @@ Tenure_Sector_table %>%
 
 
 ```{r IPEDS_Facclass_Pct_over_Time, fig.cap="Percentage of Faculty Types in Postsecondary Education (IPEDS)"}
-Tenure_table[-1]<-prop.table(as.matrix(Tenure_table[2:5]),1)
-Tenure_table[-1]<-100*Tenure_table[-1]
-Tenure_table %>%
+Tenure_Status_table %>%
   gather(STATUS, PCT, 2:5) %>%
   ggplot(aes(x=YEAR, y=PCT, group=STATUS, colour=STATUS)) +
   geom_line() +
@@ -399,20 +397,14 @@ In the following sections, we examine more closely the growth of non-tenure trac
 IPEDS shows that the percentage of non-tenure track faculty has increased in every institutional level (4-year, 2-year and less-than-2-year).  The most apparent growth is in less-than-two-year institutions.  In 2002, 70\% of faculty in these institutions were non-tenure track.  By 2007, tenured faculty had virtually disappeared from all less-than-two-year institutions. Two-year and four-year institutions have also experienced increases in their percentage of non-tenure track faculty members; albeit more moderate growth.  Just over 60\% percent of faculty in four-year institutions work under contingent contracts today.  Eighty percent of faculty in two-year schools are non-tenure track.
 
 ```{r PCT_NTT_by_Level, fig.cap="Percent Non-Tenure Track by Institutional Level"}
-
-
-
-attach(Level_Ten_table)
-mypalette<-brewer.pal(3, "Set1")
-par(mar=c(9,5,4,2), bg="oldlace")
-plot(YEAR,PCT_4YR_NTT, ylab="Percent Non-tenure",xlab="Year",main="Percent Non-tenured Faculty by Institutional Level", type="l", col=mypalette[1], ylim=c(35,100), lwd=2)
-points(YEAR,PCT_24_NTT, col=mypalette[2], type="l", lwd=2)
-points(YEAR,PCT_LESS2_NTT, col=mypalette[3], type="l", lwd=2)
-legend(2002,50, c('Four Year Institutions','Two-Year Institutions','Less than Two-Year Institutions'),lty=c(rep(1,3)), lwd=c(rep(2.5,3)),col=mypalette, cex=1, bg="white")
-mtext("Evans & Furstenberg",side=1,line=3,adj=0,cex=.7,col="black")
-mtext("Source: U.S. Department of Education, National Center for Education Statistics, Integrated \n Postsecondary Education Data System (IPEDS).  Survey of Employees by faculty status, primary \n function/occupational activity: 2002-2015.",side=1,line=5.5,adj=0,cex=.7,col="black")
-mtext("Note: All U.S.-based, postsecondary employees with faculty status in every field.",side=1,line=6.5,adj=0,cex=.7,col="black")
-detach(Level_Ten_table)
+Level_Ten_table %>%
+  ggplot(aes(x=YEAR, y=PCTNTT, group=LEVEL, colour=LEVEL)) +
+  geom_line() +
+  geom_line(size=1) +
+  scale_color_discrete("Institutional Level", labels = c('Two-Year Institutions','Four Year Institutions','Less than Two-Year Institutions')) +
+  labs(title="Percent Non-tenured Faculty by Institutional Level", subtitle= "2002-2015", x="Year", y = "Percent Non-tenure") +
+  theme(axis.text=element_text(size=10), axis.title=element_text(size=10), legend.text=element_text(size=10), legend.title=element_text(size=10)) +
+  labs(caption = "Evans & Furstenberg. \n NCES IPEDS Survey of Employees by Faculty Status, primary function/occupational activity 2002-2015. \n All U.S.-based, postsecondary employees with faculty status in every field")
 ```
 
 ### Growing Percentages of Non-tenure Track Faculty by Institutional Control
@@ -420,16 +412,14 @@ detach(Level_Ten_table)
 The percentage of faculty working off the tenure track has also increased in public, private non-profit, and for-profit institutions.  The pattern is most clear for faculty working in private, for-profit institutions.  Just over 90\% of for-profit faculty were off the tenure track at the turn of the century.  Virtually all for-profit faculty today work off the tenure track.  The percentage of non-tenure track faculty has been quite similar between public institutions and private, non-profit institutions.  There has been a gradual increase in the percentage of non-tenure track faculty since the earliest time period we examined in our data.  Around 60\% were non-tenure track in 2002.  About 65\% are non-tenure today in these kinds of institutions.
 
 ```{r PCT_NTT_by_Control, fig.cap="Percent Non-Tenure Track by Institutional Control"}
-mypalette<-brewer.pal(3, "Set2")
-attach(Inst_Control_Ten_table)
-par(mar=c(9,5,2,2), bg="old lace")
-plot(YEAR,PCT_4PROF_NTT, ylab="Percent",xlab="Year",main="Percent Nontenured Faculty by Institutional Control", type="l", col=mypalette[1], ylim=c(40,100), lwd=2)
-points(YEAR,PCT_NONPROF_NTT, col=mypalette[2], type="l", lwd=2)
-points(YEAR,PCT_PUB_NTT, col=mypalette[3], type="l", lwd=2)
-legend(2002,85,c('For-Profit Institutions','Non-Profit Institutions','Public Institutions'),lty=c(rep(1,3)), lwd=c(rep(2.5,3)),col=mypalette, cex=1, bg="white")
-mtext("Evans & Furstenberg",side=1,line=3,adj=0,cex=.8,col="black")
-mtext("Source: U.S. Department of Education, National Center for Education Statistics, Integrated \n Postsecondary Education Data System (IPEDS).  Survey of Employees by faculty status, \n primary function/occupational activity: 2002-2015.",side=1,line=6,adj=0,cex=.75,col="black")
-detach(Inst_Control_Ten_table)
+Inst_Control_Ten_table %>%
+  ggplot(aes(x=YEAR, y=PCTNTT, group=CONTROL, colour=CONTROL)) +
+  geom_line() +
+  geom_line(size=1) +
+  scale_color_discrete("Institutional Control", labels = c('For-Profit Institutions','Non-Profit Institutions','Public Institutions')) +
+  labs(title="Percent Non-tenured Faculty by Institutional Control", subtitle= "2002-2015", x="Year", y = "Percent Non-tenure") +
+  theme(axis.text=element_text(size=10), axis.title=element_text(size=10), legend.text=element_text(size=10), legend.title=element_text(size=10)) +
+  labs(caption = "Evans & Furstenberg. \n NCES IPEDS Survey of Employees by Faculty Status, primary function/occupational activity 2002-2015. \n All U.S.-based, postsecondary employees with faculty status in every field")
 ```
 
 ### Growing Percentages of Non-tenure Track Faculty by Institutional Degree-granting Status
@@ -437,16 +427,14 @@ detach(Inst_Control_Ten_table)
 There are clearly recognizable patterns among faculty working in degree-granting institutions and those not offering degrees (Figure 14).  In 2002, over 70\% of non-degree (institutional) faculty were off the tenure track.  This figure reached its ceiling (100\%) less than a decade later.  Already by 2007, only a small fraction of faculty in non-degree-granting institutions were tenured or on the tenure track.  The growth of adjuncts in degree-granting institutions has risen much more modestly over the last decade and a half.  Non-tenure track faculty are now approaching two-thirds of the faculty workforce in degree-granting institutions. 
 
 ```{r PCT_NTT_by_Degree_Granting_Status_over_Time, fig.cap="Percent Non-tenure Track by Degree Granting Status"}
-attach(Degree_Inst_Ten_table)
-mypalette<-brewer.pal(2, "Set1")
-par(mar=c(9,5,4,2), bg="oldlace")
-plot(YEAR,PCT_DEGREE_NONTENURE, ylab="Percent Non-tenure",xlab="Year",main="Percent Non-tenured Faculty by Degree-Granting Status", type="l", col=mypalette[1], ylim=c(50,100), lwd=2)
-points(YEAR,PCT_NONDEGREE_NONTENURE, col=mypalette[2], type="l", lwd=2)
-legend(2006,60,c('Degree-Granting Institutions','Non-Degree-Granting Institutions'),lty=c(rep(1,2)), lwd=c(rep(2.5,2)),col=mypalette, cex=1, bg="white")
-mtext("Evans & Furstenberg",side=1,line=3,adj=0,cex=.7,col="black")
-mtext("Source: U.S. Department of Education, National Center for Education Statistics, Integrated \n Postsecondary Education Data System (IPEDS).  Survey of Employees by faculty status, primary \n function/occupational activity: 2002-2015.",side=1,line=5.5,adj=0,cex=.7,col="black")
-mtext("Note: All U.S.-based, postsecondary employees with faculty status in every field.",side=1,line=6.5,adj=0,cex=.7,col="black")
-detach(Degree_Inst_Ten_table)
+Degree_Inst_Ten_table %>%
+  ggplot(aes(x=YEAR, y=PCTNTT, group=DEGREE, colour=DEGREE)) +
+  geom_line() +
+  geom_line(size=1) +
+  scale_color_discrete("Institutional Control", labels = c('Degree-Granting','Non-Degree Granting')) +
+  labs(title="Percent Non-tenured Faculty by Degree-granting Status", subtitle= "2002-2015", x="Year", y = "Percent Non-tenure") +
+  theme(axis.text=element_text(size=10), axis.title=element_text(size=10), legend.text=element_text(size=10), legend.title=element_text(size=10)) +
+  labs(caption = "Evans & Furstenberg. \n NCES IPEDS Survey of Employees by Faculty Status, primary function/occupational activity 2002-2015. \n All U.S.-based, postsecondary employees with faculty status in every field")
 ```
 
 ### Growing Percentages of Non-tenure Track Faculty by Carnegie Class
