@@ -258,4 +258,34 @@ table<-mdata %>%
   summarize(NONTENURE=sum(FTNTT,PT, na.rm=T),TENURE=sum(FTTEN,FTTRACK, na.rm=T)) %>%
   mutate(PCTNTT=(NONTENURE/(NONTENURE+TENURE)))
 Degree_Inst_Ten_table<-table
+# Carnegie Class x tenure status table
+# Two carnegie variables formed.  Levels collapsed differently.
+# First carnegie breakdown
+mdata$CARNEGIE1<-factor(mdata$CARNEGIE)
+levels(mdata$CARNEGIE1)<-c(rep("Associates",14),rep("BMD Institution",3),"Research",rep("BMD Institution",3),rep("Other",5), rep("Research",2),rep("Other",6))
+table<-mdata %>% 
+group_by(CARNEGIE1,YEAR) %>% 
+  summarize(NONTENURE=sum(FTNTT,PT, na.rm=T),TENURE=sum(FTTEN,FTTRACK, na.rm=T)) %>%
+  mutate(PCTNTT=(NONTENURE/(NONTENURE+TENURE)))
+Carnegie_Ten_table1<-table
+# Second carnegie breakdown
+mdata$CARNEGIE2<-factor(mdata$CARNEGIE)
+levels(mdata$CARNEGIE2)<-c(rep("Non-research",14),rep("Non-research",3),"R3",rep("Non-research",3),rep("Non-research",5), "R1","R2",rep("Non-research",6))
+table<-mdata %>% 
+  group_by(CARNEGIE2,YEAR) %>% 
+  summarize(NONTENURE=sum(FTNTT,PT, na.rm=T),TENURE=sum(FTTEN,FTTRACK, na.rm=T)) %>%
+  mutate(PCTNTT=(NONTENURE/(NONTENURE+TENURE)))
+Carnegie_Ten_table2<-table
 
+# Admissionns data
+Test_data_2015_75th<-read_csv(file.path(Data, "adm2015.csv"))
+table<-Test_data_2015_75th %>%
+  select(UNITID,SATVR75,SATMT75) %>%
+  rowwise() %>%
+  mutate(SAT_75TH=sum(SATVR75,SATMT75))
+Inst_Select_Pct_NTT_table<- table %>%
+  mutate(SAT_75THF = cut(SAT_75TH, breaks = quantile(table$SAT_75TH, probs = seq(0, 1, 0.25), na.rm = T), labels=rev(c("most_selective","very_selective","selective","less_selective")))) %>%
+  inner_join(Ind_Tenure_data, by='UNITID') %>% # keep all the rows of the Ind data and match the Inst-level characterstis with the ind data.
+  group_by(SAT_75THF,YEAR) %>%
+  summarize(NONTENURE=sum(FTNTT,PT, na.rm=T),TENURE=sum(FTTEN,FTTRACK, na.rm=T)) %>%
+  mutate(PCTNTT=(NONTENURE/(NONTENURE+TENURE)))

@@ -442,18 +442,14 @@ Degree_Inst_Ten_table %>%
 It is clear from Figure 15 that the portion of non-tenure track faculty is increasing at every Carnegie type.  Potentially, the proportion of non-tenure track faculty at Associate's institutions has leveled off over the last five years, but more data would be necessary to confirm this.  Institutions granting greater numbers of higher degrees (Bachelor's, Master's and Doctorates) are employing higher proportions of faculty off the tenure track.  Roughly half of faculty in these institutions were non-tenure track in 2002.  That proportion has grown by 6-7 percent since 2002.  Faculty at "Other" institutions also tend to be, increasingly, non-tenure track faculty.  "Other" institutions include specialized institutions that focus on limited fields (e.g., Art and Music schools, some business schools and medical institutions).  They also include schools associated with the American Indian Higher Education Consortium (Tribal schools).  Nearly 80% of faculty work off the tenure track in these schools, an increase of around 10% since 2002.
 
 ```{r PCT_NTT_by_Carnegie_Class_over_Time, fig.cap="Percent Non-Tenure Track by Carnegie Status"}
-attach(Carnegie_Ten_table)
-mypalette<-brewer.pal(4, "Set2")
-par(mar=c(9,5,4,2), bg="oldlace")
-plot(YEAR,PCT_ASSC_NTT, ylab="Percent Non-tenure",xlab="Year",main="Percent Non-tenured Faculty by Carnegie Classification", type="l", col=mypalette[1], ylim=c(40,100), lwd=2)
-points(YEAR,PCT_BMD_NTT, col=mypalette[2], type="l", lwd=2)
-points(YEAR,PCT_RESEARCH_NTT, col=mypalette[3], type="l", lwd=2)
-points(YEAR,PCT_OTH_NTT, col=mypalette[4], type="l", lwd=2)
-legend(2002,100, c('Associates Institutions','Baccalaureate/Masters Institutions','Doctoral Institutions','Other'),lty=c(rep(1,4)), lwd=c(rep(2.5,4)),col=mypalette, cex=.9, bg="white")
-mtext("Evans & Furstenberg",side=1,line=3,adj=0,cex=.7,col="black")
-mtext("Source: U.S. Department of Education, National Center for Education Statistics, Integrated \n Postsecondary Education Data System (IPEDS).  Survey of Employees by faculty status, primary \n function/occupational activity: 2002-2015.",side=1,line=5.5,adj=0,cex=.7,col="black")
-mtext("Note: All U.S.-based, postsecondary employees with faculty status in every field.",side=1,line=6.5,adj=0,cex=.7,col="black")
-detach(Carnegie_Ten_table)
+Carnegie_Ten_table1 %>%
+  ggplot(aes(x=YEAR, y=PCTNTT, group=CARNEGIE1, colour=CARNEGIE1)) +
+  geom_line() +
+  geom_line(size=1) +
+  scale_color_discrete("Carnegie Status", labels = c('Associates Institutions','Baccalaureate/Masters Institutions','Research Institutions','Other')) +
+  labs(title="Percent Non-tenured Faculty by Carnegie Classification", subtitle= "2002-2015", x="Year", y = "Percent Non-tenure") +
+  theme(axis.text=element_text(size=10), axis.title=element_text(size=10), legend.text=element_text(size=10), legend.title=element_text(size=10)) +
+  labs(caption = "Evans & Furstenberg. \n NCES IPEDS Survey of Employees by Faculty Status, primary function/occupational activity 2002-2015. \n All U.S.-based, postsecondary employees with faculty status in every field")
 ```
 
 ### Growing Percentages of Non-tenure Track Faculty by Research Intensity.
@@ -461,18 +457,14 @@ detach(Carnegie_Ten_table)
 Often, the Carnegie classification of doctoral instiutions includes their level of research intensity.  Doctoral institutions with high research activity are referred to as "R1" and doctoral institutions of moderate research intensity are "R3" institutions.  There are also "R2" institutions in between.  An important question is how the hiring of non-tenure track faculty may impact the research goals and capabilities of higher education.  The following figure explores whether the significant change in faculty contracts is any differnt in institutions of different research intensities.
 
 ```{r PCT_NTT_by_Carnegie_Research_Intensity_over_Time, fig.cap="Percent Non-Tenure Track by Research Intensity"}
-attach(Carnegie_Res_Ten_table)
-mypalette<-brewer.pal(4, "Set1")
-par(mar=c(9,5,4,2), bg="oldlace")
-plot(YEAR,PCT_R1_NTT, ylab="Percent Non-tenure",xlab="Year",main="Percent Non-tenured Faculty by Carnegie Research Intensity", type="l", col=mypalette[1], ylim=c(30,100), lwd=2)
-points(YEAR,PCT_R2_NTT, col=mypalette[2], type="l", lwd=2)
-points(YEAR,PCT_R3_NTT, col=mypalette[3], type="l", lwd=2)
-points(YEAR,PCT_NR_NTT, col=mypalette[4], type="l", lwd=2)
-legend(2002,100, c('Very High Research Intensity (R1)','High Research Intensity (R2)','Moderate Research Intensity (R3)','Non-research Institution'),lty=c(rep(1,4)), lwd=c(rep(2.5,4)),col=mypalette, cex=.9, bg="white")
-mtext("Evans & Furstenberg",side=1,line=3,adj=0,cex=.7,col="black")
-mtext("Source: U.S. Department of Education, National Center for Education Statistics, Integrated \n Postsecondary Education Data System (IPEDS).  Survey of Employees by faculty status, primary \n function/occupational activity: 2002-2015.",side=1,line=5.5,adj=0,cex=.7,col="black")
-mtext("Note: All U.S.-based, postsecondary employees with faculty status in every field.",side=1,line=6.5,adj=0,cex=.7,col="black")
-detach(Carnegie_Res_Ten_table)
+Carnegie_Ten_table2 %>%
+  ggplot(aes(x=YEAR, y=PCTNTT, group=CARNEGIE2, colour=CARNEGIE2)) +
+  geom_line() +
+  geom_line(size=1) +
+  scale_color_discrete("Carnegie Status", labels = c('Non-research Institution','Moderate Research Intensity (R3)','Very High Research Intensity (R1)','High Research Intensity (R2)')) +
+  labs(title="Percent Non-tenured Faculty by Carnegie Research Classification", subtitle= "2002-2015", x="Year", y = "Percent Non-tenure") +
+  theme(axis.text=element_text(size=10), axis.title=element_text(size=10), legend.text=element_text(size=10), legend.title=element_text(size=10)) +
+  labs(caption = "Evans & Furstenberg. \n NCES IPEDS Survey of Employees by Faculty Status, primary function/occupational activity 2002-2015. \n All U.S.-based, postsecondary employees with faculty status in every field")
 ```
 
 As seen in Figure 16, regardless of research intensity, the proportion of adjuncts is increasing in all research typologies.  R1 and R2 institutions are quite similar with regard to the time trend.  Adjuncts were a slight minority in 2002 and they are a slight majority today.  The proportion of adjuncts in R3 institutions is increasing a bit more rapidly.  There was a comparable proportion of adjuncts in R3 institutions (as in R1 and R2 institutions) in 2002.  However, the increased hiring of adjuncts in R3 institutions has made them constitute over 60\% of the faculty body today in those institutions.  Non-research institutions have also increased the portion of their faculty working off the tenure track, however changes have been more modest.  Currently, 70\% of faculty at non-research institutions are contingent.
@@ -482,20 +474,14 @@ As seen in Figure 16, regardless of research intensity, the proportion of adjunc
 Some have expressed concern that students attending less selective postsecondary institutions are more likely to have non-tenure track faculty.  Such an event has implications for the stratification of educational opportunity.  Using data from IPEDS, we examine this question.  We divided postsecondary institutions into those using admissions testing and those that did not ("non-selective").  Then, among the schools using entrance examinations, we divided them into "most selective","highly selective", "very selective","selective" and "less selective", according to whether the schools' entering freshmen were in the 95th, 85th, 75th, 50th or lower percentile, respectively.
 
 ```{r PCT_NTT_by_Selectivity, fig.cap="Percent Non-Tenure Track by Institutional Selectivity"}
-attach(Inst_Select_Pct_NTT_table)
-mypalette<-brewer.pal(6, "Set2")
-par(mar=c(9,4.5,4,2), bg="oldlace")
-plot(YEAR,most_selective, ylab="Percent Non-tenure",xlab="Year",main="Percent Non-tenured Faculty by Institutional Selectivity", type="l", col=mypalette[1], ylim=c(40,80), lwd=2.5)
-points(YEAR,highly_selective, col=mypalette[2], type="l", lwd=2.5)
-points(YEAR,very_selective, col=mypalette[3], type="l", lwd=2.5)
-points(YEAR,selective, col=mypalette[4], type="l", lwd=2.5)
-points(YEAR,Less_selective, col=mypalette[5], type="l", lwd=2.5)
-points(YEAR,Non_selective, col=mypalette[6], type="l", lwd=2.5)
-legend(2002,80, c('Most Selective','Highly Selective','Very Selective','Selective','Less Selective','Non-Selective'),lty=c(rep(1,6)), lwd=c(rep(2.5,6)),col=mypalette, cex=.9, bg="white")
-mtext("Evans & Furstenberg",side=1,line=3,adj=0,cex=.7,col="black")
-mtext("Source: U.S. Department of Education, National Center for Education Statistics, Integrated \n Postsecondary Education Data System (IPEDS).  Survey of Employees by faculty status, primary \n function/occupational activity: 2002-2015. Admissions and Test Scores Component 2015.",side=1,line=5.5,adj=0,cex=.7,col="black")
-mtext("Note: Non-Selective instiutions are those not requiring/reporting SAT or ACT composite scores \n of their entering freshmen class.",side=1,line=7,adj=0,cex=.7,col="black")
-detach(Inst_Select_Pct_NTT_table)
+Inst_Select_Pct_NTT_table %>%
+  ggplot(aes(x=YEAR, y=PCTNTT, group=SAT_75THF, colour=SAT_75THF)) +
+  geom_line() +
+  geom_line(size=1) +
+  scale_color_discrete("Selectivity", labels = c('Less Selective','Selective','Very Selective','Most Selective','Non-selective')) +
+  labs(title="Percent Non-tenured Faculty by Institutional Selectivity", subtitle= "2002-2015", x="Year", y = "Percent Non-tenure") +
+  theme(axis.text=element_text(size=10), axis.title=element_text(size=10), legend.text=element_text(size=10), legend.title=element_text(size=10)) +
+  labs(caption = "Evans & Furstenberg. \n NCES IPEDS Survey of Employees by Faculty Status, primary function/occupational activity 2002-2015. Admissions and Test Scores Component 2015. \n All U.S.-based, postsecondary employees with faculty status in every field. \n Non-Selective instiutions are those not requiring/reporting SAT or ACT composite scores of their entering freshmen class.")
 ```
 
 From Figure 17, we find that, among institutions that report or require entrance examinations (SAT Math/Reading or ACT composite), there was little variation in the percentage of non-tenure track faculty.  Whether a school's entering freshmen were in the 95th percentile or some lower selective tier, adjuncts constituted about half the faculty.  This portion has risen by about five percent over the course of thirteen years.  Today, a slight majority of faculty are non-tenure track in schools using entrance examinations.  
