@@ -493,18 +493,15 @@ There is a difference, however, between the schools using entrance examinations 
 It is well known that the administrative overhead has expanded greatly in higher education over the last decades.  Rather than allocate administrative decision-making to faculty in academic departments, formal positions were created to handle administration on a full-time basis.  Many administrators draw larger salaries and more generous benefits packages than academic faculty and some have claimed that the rising cost of higher education is linked to having to pay for the expanding administrative overhead.  In this logic, colleges and universities may increasingly utilize non-tenure track academics to handle administrative jobs and tasks.  In Figure 18, we examine the role of non-tenure track faculty in adminstrative positions.
 
 ```{r PCT_NTT_by_Admin, fig.cap="Percent Non-Tenure Track by Administrative Role"}
-attach(Admin_Tenure_table)
-mypalette<-brewer.pal(4, "Set1")
-par(mar=c(9,5,4,2), bg="oldlace")
-plot(YEAR,FTNONFACMGMT, ylab="Percent",xlab="Year",main="Tenure and Faculty Status of Postsecondary \n Administrators and Management", type="l", col=mypalette[1], ylim=c(0,100), lwd=2)
-points(YEAR,PTNONFACMGMT, col=mypalette[2], type="l", lwd=2)
-points(YEAR,FTTENTRACK, col=mypalette[3], type="l", lwd=2)
-points(YEAR,FTNTT, col=mypalette[4], type="l", lwd=2)
-legend(2002,60, c('Full-time Non-faculty','Part-time Non-faculty','Full-time Tenure/Track Faculty','Full-time Non-tenure Track Faculty'),lty=c(rep(1,4)), lwd=c(rep(2.5,4)),col=mypalette, cex=1, bg="white")
-mtext("Evans & Furstenberg",side=1,line=3,adj=0,cex=.7,col="black")
-mtext("Source: U.S. Department of Education, National Center for Education Statistics, Integrated \n Postsecondary Education Data System (IPEDS).  Survey of Employees by faculty status, primary \n function/occupational activity: 2002-2015.",side=1,line=5.5,adj=0,cex=.7,col="black")
-mtext("Note: All U.S.-based, postsecondary employees.  Excludes small number of Part-time faculty.",side=1,line=6.5,adj=0,cex=.7,col="black")
-detach(Admin_Tenure_table)
+Admin_Tenure_table %>%
+  gather(STATUS, PCT, 2:5) %>%
+  ggplot(aes(x=YEAR, y=PCT, group=STATUS, colour=STATUS)) +
+  geom_line() +
+  geom_line(size=1) +
+  scale_color_discrete("Faculty Class", labels = c('Full-time Non-faculty Mgmt','Full-time NTT','Full-time Tenure/Track','Part-time Mgmt')) +
+  labs(title="Tenure and Faculty Status of Postsecondary \n Administrators and Management", subtitle= "2002-2015", x="Year", y = "Percent of Management") +
+  theme(axis.text=element_text(size=10), axis.title=element_text(size=10), legend.text=element_text(size=10), legend.title=element_text(size=10)) +
+  labs(caption = "Evans & Furstenberg. NCES IPEDS Survey of Employees by Assigned Position (EAP), primary function/occupational activity 2002-2015.")
 ```
 
 Figure 18 suggests that adjuncts do not have an increasingly important role in management.  In fact, workers classified as "faculty" in general are not involved in administration.  Only a fifth of administrators have the classification of "faculty."  This may be because faculty simply are not used extensively in an administrative capacity. Alternatively, institutions may not classify academics as "faculty" once taking on extensive roles in administration or management outside of their home department.  Clarification on this topic would be important to fully answer questions regarding the role of faculty adjuncts in higher education administration.  In any case, IPEDS data suggests that the work of administration is principally done by individuals working full-time in a non-faculty capacity.  There may even be a slight decrease in the role faculty in postsecondary administration over time, however, the time trend is not entirely clear.  Part-time, non-tenure track faculty were excluded from Figure 18 because there are so few of them participate in management.
