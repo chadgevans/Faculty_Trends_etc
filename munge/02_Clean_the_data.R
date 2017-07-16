@@ -171,9 +171,7 @@ Inst_Carnegie_table<-table
 table<-data %>% 
   select(LEVEL,CONTROL) %>%
   na.omit()
-Delta_Crosstable<-table
-
-
+Delta_Crosstable <- prop.table(table(data$LEVEL, data$CONTROL), 2)
 
 ##########################################################################
 # IPEDS Complete Data (Employees by Assigned Position (EAP)) 
@@ -187,7 +185,7 @@ data<-as_data_frame(do.call("rbind.fill", mapply(cbind, datalist, YEAR = list(20
 data0211<-data[data$YEAR %in% c(2002:2011),c("YEAR","UNITID","EAPTOT","EAPRECTP")]
 data1215<-data[data$YEAR %in% c(2012:2015),c("YEAR","UNITID","EAPFT","EAPPT","EAPCAT")] # Splitting these two intervals is necessary b/c they're structured differently
 
-table<-data0211 %>%
+Tenure_table0211 <- data0211 %>%
   filter(EAPRECTP %in% c(2102, 2103, 2104, 3102, 3103, 3104)) %>%
   mutate(FACULTY=recode(EAPRECTP, `2102` = 'FTTEN', `2103` = 'FTTRACK', `2104` = 'FTNTT',`3102`='PTTEN',`3103`='PTTRACK',`3104`='PTNTT')) %>% # With faculty status, tenured; "10020" means EAP number or FACSTAT number 20
   select(-EAPRECTP) %>%
@@ -195,9 +193,8 @@ table<-data0211 %>%
   rowwise() %>% 
   mutate(PT=sum(PTNTT,PTTEN,PTTRACK, na.rm=T)) %>%
   select(-PTNTT,-PTTEN,-PTTRACK) 
-Tenure_table0211<-table
 
-table<-data1215 %>%
+Tenure_table1215 <- data1215 %>%
   select(YEAR,UNITID,EAPFT,EAPPT,EAPCAT) %>%
   filter(EAPCAT %in% c(10020,10030,10040)) %>%
   mutate(FACULTY=recode(EAPCAT, `10020` = 'TENURE', `10030` = 'TRACK', `10040` = 'NONTENURE')) %>% # With faculty status, tenured; "10020" means EAP number or FACSTAT number 20
@@ -209,10 +206,9 @@ table<-data1215 %>%
   mutate(PT=sum(NONTENURE_EAPPT,TENURE_EAPPT,TRACK_EAPPT,na.rm=T)) %>%
   select(YEAR,UNITID,NONTENURE_EAPFT,TENURE_EAPFT,TRACK_EAPFT,PT) %>%
   `colnames<-`(c("YEAR","UNITID","FTNTT","FTTEN","FTTRACK","PT"))
-Tenure_table1215<-table
 
 Ind_Tenure_data<-rbind(Tenure_table0211,Tenure_table1215)
-table<- Ind_Tenure_data %>%
+table<-Ind_Tenure_data %>%
   gather(STATUS, VALUE, -YEAR, -UNITID) %>%
   group_by(YEAR, STATUS) %>%
   summarise(SUM=sum(VALUE, na.rm = T)) %>%
@@ -281,7 +277,7 @@ Inst_Select_Pct_NTT_table<- table %>%
   mutate(PCTNTT=(NONTENURE/(NONTENURE+TENURE)))
 
 # Administrators
-table<-data0211 %>%
+MGMT_0211<-data0211 %>%
   filter(EAPRECTP %in% c(2152, 2153, 2154, 2155, 3152, 3153, 3154, 3155)) %>%
   mutate(FACULTY=recode(EAPRECTP, `2152` = 'FTTEN', `2153` = 'FTTRACK', `2154` = 'FTNTT',`2155`='FTNONFAC',`3152`='PTTEN',`3153`='PTTRACK',`3154`='PTNTT', `3155`='PTNONFAC')) %>% # With faculty status, tenured; "10020" means EAP number or FACSTAT number 20
   select(-EAPRECTP) %>%
@@ -289,9 +285,8 @@ table<-data0211 %>%
   rowwise() %>% 
   mutate(PT=sum(PTNTT,PTTEN,PTTRACK,PTNONFAC, na.rm=T), FTTT=sum(FTTEN,FTTRACK, na.rm=T)) %>%
   select(YEAR,UNITID, PT, FTNONFAC, FTTT, FTNTT)
-MGMT_0211<-table
 
-table<-data1215 %>%
+MGMT_1215<-data1215 %>%
   select(YEAR,UNITID,EAPFT,EAPPT,EAPCAT) %>%
   filter(EAPCAT %in% c(30010,30020,30030,30040,30050)) %>%
   mutate(FACULTY=recode(EAPCAT, `30010` = 'FACMGMT', `30020` = 'TENURE', `30030` = 'TRACK', `30040` = 'NONTENURE',`30050` = 'NONFAC')) %>% 
@@ -303,10 +298,8 @@ table<-data1215 %>%
   mutate(FTTT=sum(TENURE_EAPFT,TRACK_EAPFT, na.rm=T), PT=sum(FACMGMT_EAPPT,NONFAC_EAPPT,NONTENURE_EAPPT,TENURE_EAPPT,TRACK_EAPPT, na.rm=T)) %>%
   select(YEAR,UNITID, PT, NONFAC_EAPFT, FTTT, NONTENURE_EAPFT) %>%
   `colnames<-`(c("YEAR", "UNITID", "PT", "FTNONFAC", "FTTT", "FTNTT"))
-MGMT_1215<-table
 
-MGMT_data<-rbind(MGMT_0211,MGMT_1215)
-table<- MGMT_data %>%
+table<-rbind(MGMT_0211,MGMT_1215) %>%
   gather(STATUS, VALUE, -YEAR, -UNITID) %>%
   group_by(YEAR, STATUS) %>%
   summarise(SUM=sum(VALUE, na.rm = T)) %>%
@@ -315,9 +308,36 @@ table[-1]<-prop.table(as.matrix(table[2:5]),1)
 table[-1]<-100*table[-1]
 Admin_Tenure_table<-table
 
+# Medical or Non-medical
+Meddata0211<-data[data$YEAR %in% c(2002:2011),c("YEAR","UNITID","EAPTYP","EAPMED","EAPRECTP")]
+Meddata1215<-data[data$YEAR %in% c(2012:2015),c("YEAR","UNITID","EAPCAT","EAPTYP","EAPMED")]
 
+Medtable_0211<-Meddata0211 %>%
+  filter(EAPRECTP %in% c(1102, 1103, 1104)) %>%
+  mutate(FACULTY=recode(EAPRECTP, `1102` = 'TENURE',`1103` = 'TRACK',`1104` = 'NONTENURE')) %>%
+  select(-EAPRECTP) %>%
+  gather(STATUS, COUNT, -YEAR, -UNITID, -FACULTY) %>%
+  unite(FACULTY_STATUS,FACULTY,STATUS) %>%
+  spread(FACULTY_STATUS, COUNT) %>%
+  rowwise() %>% 
+  mutate(TTMED=sum(TENURE_EAPMED,TRACK_EAPMED, na.rm=T), TTNMED=sum(TENURE_EAPTYP,TRACK_EAPTYP, na.rm=T)) %>%
+  select(YEAR, UNITID, TTMED, TTNMED, NONTENURE_EAPMED, NONTENURE_EAPTYP)
 
-Admin_Tenure_table<-data.frame(rbind(Aggregated_table_0211,Aggregated_table_1215))
-Admin_Tenure_table[-1]<-prop.table(as.matrix(Admin_Tenure_table[,2:6]),1)
-Admin_Tenure_table[,-1]<-100*Admin_Tenure_table[,-1]
-save(Admin_Tenure_table, file="/Users/chadgevans/Dissertation/Projects/Build_Dataset/IPEDS/Cleaned_Data/Admin_Tenure_table.RData")
+Medtable_1215<-Meddata1215 %>%
+  filter(EAPCAT %in% c(10020,10030,10040)) %>%
+  mutate(FACULTY=recode(EAPCAT, `10020` = 'TENURE', `10030` = 'TRACK', `10040` = 'NONTENURE')) %>% 
+  select(-EAPCAT) %>%
+  gather(STATUS, COUNT, -YEAR, -UNITID, -FACULTY) %>%
+  unite(FACULTY_STATUS,FACULTY,STATUS) %>%
+  spread(FACULTY_STATUS, COUNT) %>%
+  rowwise() %>% 
+  mutate(TTMED=sum(TENURE_EAPMED,TRACK_EAPMED, na.rm=T), TTNMED=sum(TENURE_EAPTYP,TRACK_EAPTYP, na.rm=T)) %>%
+  select(YEAR, UNITID, TTMED, TTNMED, NONTENURE_EAPMED, NONTENURE_EAPTYP)
+
+Med_table<-rbind(Medtable_0211,Medtable_1215) %>%
+  gather(STATUS, VALUE, -YEAR, -UNITID) %>%
+  group_by(YEAR, STATUS) %>%
+  summarise(SUM=sum(VALUE, na.rm = T)) %>%
+  spread(STATUS,SUM) %>% 
+  mutate(PCTNTTMED=NONTENURE_EAPMED/(TTMED+NONTENURE_EAPMED), PCTNTTNONMED=NONTENURE_EAPTYP/(NONTENURE_EAPTYP+TTNMED)) %>% 
+  select(YEAR, PCTNTTMED, PCTNTTNONMED)

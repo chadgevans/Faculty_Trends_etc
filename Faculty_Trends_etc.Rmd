@@ -56,14 +56,6 @@ Private_Cache <- "/Users/chadgevans/Research/Projects/Data/HERI/Cache"
 #Product_Directory<-"/Users/chadgevans/Research/Dissertation/Projects/Products" # edit this
 ```
 
-```{r Clean_Data_Import}
-cleanedDatasets<-c("facdata.Rdata", "AFTtable.Rdata","expensedata.RData","IPEDS_fac_table.RData","Ten_fac_table.RData","Prof_type_table.RData","Inst_Num_table.RData","fac_table.RData","merged_ind_inst_data.RData","Degree_Inst_Ten_table.RData","Inst_Control_Ten_table.RData","Carnegie_Ten_table.RData","Level_Ten_table.RData","Delta_expenses_table.RData", "FTPTdf.RData","Sector_Inst_Ten_table.RData","InstCat_Ten_table.RData", "Sector_Inst_table1987.Rdata","Level_Inst_table1987.RData", "Control_Inst_table1987.RData", "Carnegie_Inst_table1987.RData","Tenure_table.RData","Inst_Level_table.RData", "Inst_Control_table.RData","Inst_Degree_table.RData","Inst_Carnegie_table.RData","Inst_Ten_table.RData","Med_table.RData","Admin_Tenure_table.RData", "Carnegie_Res_Ten_table.RData", "Inst_Select_Pct_NTT.RData", "Delta_Crosstable.RData", "Delta_expenses_table2.RData")
-for(i in cleanedDatasets){
-  load(file.path(cache, i))
-}
-load(file.path(Private_Cache,"Cleaned_HERI.RData"))
-```
-
 ## Munge{#munge}
 ```{r Data_Munge, warning=FALSE}
 source(file.path(Munge, "02_Clean_the_data.R"))
@@ -299,7 +291,7 @@ Each class of institution in the Carnegie system has grown since the early 1990s
 Finally, we examine the use of tenure systems in postsecondary education.  Historically, virtually every institution held a body of permanent faculty with tenured contracts.  It is well-known that the number of tenure systems as declined over time.  In the following figure, we document this trend in schools by institutional sector (level and control).  
 
 ```{r Pct_Inst_w_Tenure_Sys_over_Time, fig.cap="Percent of Institutions with Tenure Systems, by Sector"}
-Tenure_table %>%
+Tenure_Sector_table %>%
   filter(UNIT=="INST") %>% 
   gather(TENURE, PCT, 2:15)  %>% 
   filter(TENURE %in% c("FORPROF","PUB4YRTOTAL","PUB2YR","NONPROF4YRTOTAL","NONPROF2YR")) %>%
@@ -323,7 +315,6 @@ Second, some institutional types have grown more than others and it is worth hig
 The other important area of prominent growth has been less-than-two-year institutions.  Not only has their number increased in recent times, but their growth has been accelerating over the last decade and a half.  Today, there are as many less-than-two-year institutions as there are traditional two-year institutions.  Some of these programs result in a terminal degree, but many no doubt simply provide an unaccredited certificate.  It is not clear what the reasons are for this growth, nor what the consequences will be.  Nearly a third of institutions today are less-than-two-year institutions.
 
 ```{r}
-Delta_Crosstable <- prop.table(table(data$LEVEL, data$CONTROL), 2)
 Delta_Crosstable %>%
   `*`(100) %>%
   round(1) %>%
@@ -511,16 +502,15 @@ Figure 18 suggests that adjuncts do not have an increasingly important role in m
 Another important question with regard to adjunct growth is whether this growth may be related to medical or clinical fields.  It is widely known that medical fields regularly employ off-tenure track faculty to teach practical courses in nursing, medical research and medicine.  The growth of adjuncts, then, may be the consequence of the staffing of medical fields.
 
 ```{r PCT_NTT_by_Medical, fig.cap="Percent Non-Tenure Track by Medical/Non-Medical Fields"}
-attach(Med_table)
-mypalette<-brewer.pal(3, "Set1")
-par(mar=c(9,5,4,2), bg="oldlace")
-plot(YEAR,AGG_EAPMED_NTT, ylab="Percent Non-tenure",xlab="Year",main="Percent Non-tenured Faculty by Medical/Non-Medical Fields", type="l", col=mypalette[1], ylim=c(40,100), lwd=2)
-points(YEAR,AGG_EAPTYP_NTT, col=mypalette[2], type="l", lwd=2)
-legend(2002,100, c('Medical Fields','Non-medical Fields'),lty=c(rep(1,2)), lwd=c(rep(2.5,2)),col=mypalette, cex=1, bg="white")
-mtext("Evans & Furstenberg",side=1,line=3,adj=0,cex=.7,col="black")
-mtext("Source: U.S. Department of Education, National Center for Education Statistics, Integrated \n Postsecondary Education Data System (IPEDS).  Survey of Employees by faculty status, primary \n function/occupational activity: 2002-2015.",side=1,line=5.5,adj=0,cex=.7,col="black")
-mtext("Note: All U.S.-based, postsecondary employees with faculty status in every field.",side=1,line=6.5,adj=0,cex=.7,col="black")
-detach(Med_table)
+Med_table %>%
+  gather(STATUS, PCT, 2:3) %>%
+  ggplot(aes(x=YEAR, y=PCT, group=STATUS, colour=STATUS)) +
+  geom_line() +
+  geom_line(size=1) +
+  scale_color_discrete("Institution Type", labels = c('Medical','Non-medical')) +
+  labs(title="Tenure Status of Postsecondary Faculty \n in Medical and Non-medical Schools", subtitle= "2002-2015", x="Year", y = "Percent Non-tenure Track Faculty") +
+  theme(axis.text=element_text(size=10), axis.title=element_text(size=10), legend.text=element_text(size=10), legend.title=element_text(size=10)) +
+  labs(caption = "Evans & Furstenberg. NCES IPEDS Survey of Employees by Assigned Position (EAP), primary function/occupational activity 2002-2015. \n All U.S.-based, postsecondary employees with faculty status in every field.")
 ```
 
 Figure 19 shows, generally, that adjuncts have a similar presence in both medical and non-medical fields.  Either way, just over 60\% of faculty were non-tenure track in 2002.  There may have been some minor growth of adjuncts in medical and clinical positions compared to non-medical positions, however, the growth rates are pretty comparable.  The more important story is that there are comparable percentages of non-tenure track faculty in both medical and non-medical fields.
@@ -532,7 +522,6 @@ There are several important features for which data is unavailable in IPEDS.  Sp
 Before investigating these important faculty features, however, it is worth a quick empirical comparison of non-tenure track faculty in our two longitudinal datasets.  Figure 20 from SDR uses the same analytic categories as Figure 10 (IPEDS), only the SDR dataset is limited to STEM Ph.D.'s.
 
 ```{r, SDR_Tenure_Over_Time, out.width = "250px", fig.align="center", fig.cap="Percentage of Faculty Types in Postsecondary Education (SDR)"}
-#include_graphics("/Users/chadgevans/Research/Dissertation/Projects/Products/SDR_Tenure_Pct_over_Time.png")
 include_graphics(file.path(Graph, "SDR_Tenure_Pct_over_Time.png"))
 ```
 
@@ -543,7 +532,6 @@ Comparing these figures (Figure 20 and Figure 10), we see similarities.  In both
 A common belief is that the number of post-doc appointments may be growing in order to accomodate the growing numbers of doctorate recipients who are unable to find tenure-track or even full-time work.  In Figure 21, we examine this concern, documenting how the proportion of Ph.D.'s working in post-doc positions has changed over the last decades.
 
 ```{r, SDR_PostDoc_over_Time, out.width = "250px", fig.align="center", fig.cap="Proportion of Ph.D. Recipients Working as Postdocs"}
-#include_graphics("/Users/chadgevans/Research/Dissertation/Projects/Products/SDR_PostDoc_over_Time.png")
 include_graphics(file.path(Graph, "SDR_PostDoc_over_Time.png"))
 ```
 
@@ -554,9 +542,7 @@ Among Ph.D.'s working in academia, seven percent work in non-tenure track postdo
 Another common argument is that adjunct positions, increasingly, are used as a transition to retirement.  In this reasoning, full-time faculty and some individuals from the private sector accept off-tenure positions in order to gradually reduce their workload before entering permanent retirement.  As SDR contains age-related information, this question can be examined using the dataset.
 
 ```{r, Seniors_Over_Time, out.width = "250px", fig.align="center", fig.cap="Proportion of Retirement-age Faculty"}
-#include_graphics("/Users/chadgevans/Research/Dissertation/Projects/Products/SDR_Seniors_over_Time.png")
 include_graphics(file.path(Graph, "SDR_Seniors_over_Time.png"))
-
 ```
 
 This Figure 22 suggests that, indeed, the number of faculty working during retirement years (65+) is increasing over time.  This is particularly the case for seniors opting to continue a full-time, tenured position well after their 65th birthday.  Just over two percent of faculty worked as seniors in 1995.  Six percent do so today.  There has also been moderate growth among seniors working part-time off the tenure track and seniors working full-time, non-tenure track positions.  
@@ -568,14 +554,12 @@ While older faculty (65+) continue to constitute only a small minority of postse
 A final important question about the growth of adjuncts is tied to why exactly faculty work part-time in the first place.  These are highly educated and trained indviduals with valuable skills in a wide range of fields.  As mentioned earlier, one theory is that part-time work helps accomodate the growing number of Ph.D.'s who are unable to find full-time work.  Other theories are that part-time work helps faculty transition to retirement, manage family responsibilities or hold a full-time career outside of academia.  The SDR instrument specifically asked Ph.D. recipients working part-time why exactly they chose a part-time job.  The following figure (Figure 23) casts light on the many reasons for doing so.
 
 ```{r, PT_Reasons, out.width = "250px", fig.align="center", fig.cap="Reasons for Part-time Work in Academia in 2013"}
-#include_graphics("/Users/chadgevans/Research/Dissertation/Projects/Products/SDR_PT_Reasons.png")
 include_graphics(file.path(Graph, "SDR_PT_Reasons.png"))
 ```
 
 One important finding from this figure is that many adjuncts are not even interested in full-time work.  There are also other, more specific, reasons for their part-time status.  Nearly three in ten part-time respondents claimed their adjunct position is helping them transition to retirement (semi-retired).  About one in four explained that adjunct work has helped them fulfill family responsibilities.  Just over 15\% claimed that they worked part-time in order to facilitate a full-time career outside of academia.  Other jobs they hold may be teaching positions at other institutions or a career in the private sector.  Nearly a third of part-time faculty stated that they worked part-time because a full-time job was unavailable to them.  So, overall, part-time work is not typically due to an inability to find full-time work.  It helps adjunct balance other goals and responsibilities.
 
 ```{r, SDR_PT_Reasons_Over_Time, out.width = "250px", fig.align="center", fig.cap="Reasons for Part-time Work in Academia 2006-2013"}
-#include_graphics("/Users/chadgevans/Research/Dissertation/Projects/Products/SDR_PT_reasons_over_Time.png")
 include_graphics(file.path(Graph, "SDR_PT_reasons_over_Time.png"))
 ```
 
@@ -585,14 +569,12 @@ These categories or reasons for part-time work can also be examined over time, b
 For this question, we can return to the IPEDS data source.  Non-tenure track faculty work all over the United States, but they are over-respresented in certain parts of the country.  Highly urbanized areas and states on the coast tend to have higher percentages of non-tenure track faculty.  This includes Virginia, North Carolina, Oregon and Florida.  The midwest and southwest also are generally more dependent on adjuncts.  Although not a coastal state, highly-urbanized Arizona has the highest percentage of non-tenure track faculty (82\%).  Rural states tend to be less dependent on contingent faculty.  Only 52\% of faculty work off the tenure track in Wyoming and Rhode Island.  Other states with lower employment of adjuncts include North Dakota, Montana and Kentucky.  An important caveat is that part-time faculty are more likely to have been double counted than full-time faculty, as some of them hold multiple jobs.  Because part-timers are more likely to be non-tenure track, non-tenure track faculty may be overrepresented in this graphic.  This same caveat is true for the next map.
 
 ```{r, US_States_Pct_NTT, out.width = "250px", fig.align="center", fig.cap="Non-tenure Track Faculty in the United States"}
-#include_graphics("/Users/chadgevans/Research/Dissertation/Projects/Products/US_States_Pct_NTT.png")
 include_graphics(file.path(Graph, "US_States_Pct_NTT.png"))
 ```
 
 The employment of part-time faculty tends to follow similar patterns.  Populous states and those in the southwest, midwest and New England gererally utilize higher proportions of part-time faculty.  Arizona, again, has the highest percentage of part-time faculty (nearly two-thirds).  Other states utilizing high percentages of part-time faculty include California, Delaware and Illinois.  Rural states are less dependent on part-time labor.  Only 12\% of faculty work part-time in Wyoming.  North Dakota, Oklahoma and Arkansas also have notably lower percentages of part-time faculty.  The caveat mentioned earlier is also relevant here.  Part-time faculty, more than full-time faculty, are more likely to have been double counted if they teach at multiple institutions.
 
 ```{r, US_States_Pct_PT, out.width = "250px", fig.align="center", fig.cap="Part-time Faculty in the United States"}
-#include_graphics("/Users/chadgevans/Research/Dissertation/Projects/Products/US_States_Pct_PT.png")
 include_graphics(file.path(Graph, "US_States_Pct_PT.png"))
 ```
 

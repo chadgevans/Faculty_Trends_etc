@@ -2,7 +2,7 @@ Introductory Chapter
 ================
 Chad Evans
 
-Built with 3.3.2. Last run on 2017-07-04.
+Built with 3.3.2. Last run on 2017-07-16.
 
 -   [Configure](#config)
     -   Libraries
@@ -25,14 +25,6 @@ Built with 3.3.2. Last run on 2017-07-04.
 
 Configure
 ---------
-
-``` r
-cleanedDatasets<-c("facdata.Rdata", "AFTtable.Rdata","expensedata.RData","IPEDS_fac_table.RData","Ten_fac_table.RData","Prof_type_table.RData","Inst_Num_table.RData","fac_table.RData","merged_ind_inst_data.RData","Degree_Inst_Ten_table.RData","Inst_Control_Ten_table.RData","Carnegie_Ten_table.RData","Level_Ten_table.RData","Delta_expenses_table.RData", "FTPTdf.RData","Sector_Inst_Ten_table.RData","InstCat_Ten_table.RData", "Sector_Inst_table1987.Rdata","Level_Inst_table1987.RData", "Control_Inst_table1987.RData", "Carnegie_Inst_table1987.RData","Tenure_table.RData","Inst_Level_table.RData", "Inst_Control_table.RData","Inst_Degree_table.RData","Inst_Carnegie_table.RData","Inst_Ten_table.RData","Med_table.RData","Admin_Tenure_table.RData", "Carnegie_Res_Ten_table.RData", "Inst_Select_Pct_NTT.RData", "Delta_Crosstable.RData", "Delta_expenses_table2.RData")
-for(i in cleanedDatasets){
-  load(file.path(cache, i))
-}
-load(file.path(Private_Cache,"Cleaned_HERI.RData"))
-```
 
 Munge
 -----
@@ -112,7 +104,7 @@ EnrollTab %>%
   geom_line() +
   geom_line(size=1) +
   labs(title="Postsecondary Enrollment", subtitle= "By Full-time and Part-time Status",x="Year", y = "Students (in Millions)") +
-  labs(caption = "Evans & Furstenberg. IPEDS 1959-2024 (IES-calculated Projections).") +
+  labs(caption = "Evans & Furstenberg. IPEDS 1959-2026 (IES-calculated Projections).") +
   scale_color_discrete("Student Status", labels = c('Full-time','Part-time'))
 ```
 
@@ -121,9 +113,12 @@ EnrollTab %>%
 Historically, higher education has been very dependent on government support and public financial support has increased yearly for decades. However, while the government's absolute subsidization of higher education has increased over time, it has not kept up with the expansion in the student population. As a result, the per-pupil rate of government support has slowly declined. This has forced institutions to pursue cost-saving measures and alternative sources of revenue. In large part, the public has shifted the financial burden of higher education from taxpayers onto the students themselvee. This is evident from the conistent increase in tuition over the last decades.
 
 ``` r
+tuition_table<-tuition_table[!(tuition_table$CONTROL=="All" | tuition_table$CONTROL=="Private"),] 
+#tuition_table<-tuition_table[!(tuition_table$CONTROL=="PRIVATE" & tuition_table$YEAR>=1999),] 
 tuition_table %>% 
-  gather(CONTROL, TUITION, 2:7) %>% 
-  ggplot(aes(x=YEAR, y=TUITION, group=CONTROL, colour=CONTROL)) + 
+  gather(TYPE, TUITION, 2:3) %>% 
+  unite("INST",c(CONTROL, TYPE)) %>%
+  ggplot(aes(x=YEAR, y=TUITION, group=INST, colour=INST)) + 
   geom_line() +
   geom_line(size=1) +
   scale_color_discrete("Institution Type", labels = c('Private For-profit Four-year','Private For-profit Two-year','Private Non-profit Four-year','Private Non-profit Two-year','Public Four-year Institutions','Public Two-year Institutions')) +
@@ -199,18 +194,10 @@ kable(table)
 |  2012|         41.4|       48.10|        6.72|        45.4|          142.1|      14.91|       48.16|       31.56|           60.2|    474|           30.0|
 |  2013|         42.2|       50.42|        6.73|        47.2|          145.7|      14.85|       48.36|       32.45|           59.1|    484|           30.1|
 
-``` r
-table[which.min(table$PCT_INSTRUCT),"YEAR"]
-```
-
     ## # A tibble: 1 x 1
     ##    YEAR
     ##   <int>
     ## 1  1994
-
-``` r
-table[which.max(table$PCT_INSTRUCT),"YEAR"]
-```
 
     ## # A tibble: 1 x 1
     ##    YEAR
@@ -218,15 +205,13 @@ table[which.max(table$PCT_INSTRUCT),"YEAR"]
     ## 1  1997
 
 ``` r
-op <- par(mar = c(12,5,4,2) + 0.1, bg="aliceblue") ## default is c(5,4,4,2) + 0.1
-bp<-expensedata[-11,3]*1000/1000000000 # adjusted for 1000s, converted to billions
-barplot<-barplot(bp, axes = FALSE, axisnames = FALSE, main="Distribution of Expenses in Higher Education in 2014", ylab="Expenses (in billions)", col=blues9, cex.lab=1, cex.names=5)
-labels<-row.names(expensedata)[-11]
-text(barplot, par('usr')[3], labels = labels, srt = 45, adj = c(1.1,1.1), xpd = TRUE, cex=.9)
-axis(2)
-title(xlab = "Expense Categories", cex.lab = 1, line = 6.5)
-mtext("Evans & Furstenberg",side=1,line=8,adj=0,cex=.7,col="black")
-mtext("Source: U.S. Department of Education, National Center for Education Statistics, Integrated \n Postsecondary Education Data System (IPEDS),Finance component (provisional data) 2014.",side=1,line=9.5,adj=0,cex=.7,col="black")
+expensedata %>% 
+  ggplot(aes(x=EXPENSE, y=ALL)) + 
+  geom_bar(stat="identity", fill='dodgerblue4') +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(title = "Distribution of Expenses in Higher Education in 2014", x = "Expense Type", y = "Expense (in billions)") +
+  labs(caption = "Evans & Furstenberg. NCES IPEDS Finance Component 2014.") +
+  theme(panel.background = element_rect(fill = 'aliceblue', colour = 'black'))
 ```
 
 ![Distribution of Higher Education Expenses in 2014](graphs/Higher_Ed_Expenses_2014-1.png)
@@ -234,31 +219,27 @@ mtext("Source: U.S. Department of Education, National Center for Education Stati
 Public and Private institutions allocate resources in similar ways. In both cases, instruction is far and away the most sizeable cost. Public institutions, however, spend a bit more on public service and student aid. Private institutions channel a higher proportion of resources towards independent operations and institutional support. While the disribution of expenses is fairly similar, the absolute expenditures are different. Private institutions spend considerably less in the broader scope of higher education. This may be because public instutions educate greater numbers of students overall (and thus must spend more to accomplish this). Potentially, however, private institutions may be more efficient. Further research should clarify this. In any case, public institutions spent 315 billion overall and private institutions spent 173 billion in 2014.
 
 ``` r
-attach(expensedata)
-table<-expensedata*1000/1000000000
-colnames(table)<-c("Public Institutions","Private Institutions","All Institutions")
-Total<-table[11,]
-table<-as.data.frame(prop.table(as.matrix(table[-11,]),2))
-kable(100*table, caption = "Distribution of budget expenses in Public and Private colleges and universities in 2014", digits=2)
+expensedata[-1] <-expensedata[-1] %>% 
+  as.matrix() %>% 
+  prop.table(margin = 2) %>%
+  `*`(100) %>%
+  round(1)
+kable(expensedata, caption = "Distribution of budget expenses in Public and Private colleges and universities in 2014")
 ```
 
-|                        |  Public Institutions|  Private Institutions|  All Institutions|
-|------------------------|--------------------:|---------------------:|-----------------:|
-| Academic support       |                 8.69|                  8.95|              8.79|
-| Auxiliary enterprises  |                 9.66|                  9.24|              9.51|
-| Hospital services      |                11.23|                 10.05|             10.80|
-| Independent operations |                 0.49|                  3.29|              1.51|
-| Institutional support  |                10.54|                 13.12|             11.48|
-| Instruction            |                32.78|                 32.90|             32.82|
-| Public service         |                 4.51|                  1.42|              3.39|
-| Research               |                10.73|                 10.26|             10.56|
-| Net Aid/Other          |                 5.29|                  2.32|              4.21|
-| Student services       |                 6.07|                  8.43|              6.93|
-
-``` r
-rm(table)
-detach(expensedata)
-```
+| EXPENSE                       |  PUBLIC|  PRIVATE|   ALL|
+|:------------------------------|-------:|--------:|-----:|
+| Instruction                   |    31.6|     32.9|  32.0|
+| Research                      |    10.3|     10.3|  10.3|
+| Public service                |     4.3|      1.4|   3.3|
+| Academic support              |     8.4|      9.0|   8.6|
+| Student services              |     5.8|      8.4|   6.8|
+| Institutional support         |    10.1|     13.1|  11.2|
+| Auxiliary enterprises         |     9.3|      9.2|   9.3|
+| Hospital services             |    10.8|     10.1|  10.5|
+| Independent operations        |     0.5|      3.3|   1.5|
+| Other expenses and deductions |     3.7|      1.8|   3.1|
+| Net grant aid to students     |     5.1|      0.5|   3.5|
 
 In short, IPEDS data show that the student population has grown rapidly since the late 1950s. However, as this population growth was so substantial, public subsidization of higher education has been unable to keep up in terms of per-pupil expenditures (SHEEO Report). As a result, institutions have passed an increasing share of the financial burden onto students in the form of higher tuition and fees. Government programs like Stafford loans and private financing have provided a means and mechanism for students to take on this burden, binding them financially in student debt, sometimes for decades. Market forces have compelled institutions to innovate and reduce costs whereever possible. As instruction constitutes a third of the budget, it has often been the target of many changes.
 
@@ -272,23 +253,22 @@ Higher enrollment, financial constraints and a demand for contemporary skills ha
 By institutional level, we refer to the intensity and duration of academic programs offered by an institution. The Department of Education classifies institutions into one of three levels: 4-year or higher (4-year), 2-but-less-than-4-year (2-year), and less-than-2-year institutions. Four-year institutions tend to have the most intense program requirements and many are selective of their students. They also have strong research programs in many cases. Two-year institutions tend to have open enrollment policies and focus on career-oriented programs. These programs typically result in a certificate, a professional-technical degree, or an associate’s degree that is useful for transfering to a four-year institution. Instructional programs at four-year institutions are typically more general than 2-year schools. Less-than-two-year institutions fullfill a variety of needs (e.g., professional, social, etc.), but typically do not offer formal degrees.
 
 ``` r
-attach(Inst_Level_table)
-mypalette<-brewer.pal(3, "Set1")
-par(mar=c(9,5,4,2), bg="oldlace")
-plot(YEAR, FOUR, ylab="Number of Institutions",xlab="Year",main="Growth in Postsecondary Institutions by Level", col=mypalette[1], type="l",lwd=2, ylim = c(0,3500))
-points(YEAR,TWOFOUR,col=mypalette[2],type="l",lwd=2)
-points(YEAR,LESS2,col=mypalette[3],type="l",lwd=2)
-legend(1980,3500,c('Four-year Institutions','Two-year Institutions','Less-than-2-year Institutions'),lty=c(1,1,1), lwd=c(2,2,2),col=mypalette, cex=1, bg="white")
-mtext("Evans and Furstenberg",side=1,line=3,adj=0,cex=.7,col="black")
-mtext("Source: U.S. Department of Education, National Center for Education Statistics, Integrated \n Postsecondary Education Data System (IPEDS), Survey of Institutional Characteristics.",side=1,line=5,adj=0,cex=.7,col="black")
-mtext("Note: Changes in counts of institutions over time are partly affected by changes in survey design and \n choices of categorization.",side=1,line=6.5,adj=0,cex=.7,col="black")
+Inst_Level_table %>% 
+  gather(LEVEL, COUNT, 2:4) %>% 
+  ggplot(aes(x=YEAR, y=COUNT, group=LEVEL, colour=LEVEL)) + 
+  geom_line() +
+  geom_line(size=1) +
+  scale_color_discrete("Institution Level", labels = c('4-year',"less than 2-year",'2-year')) +
+  labs(title="Growth in Postsecondary Institutions by Level", subtitle= "1989-2015", x="Year", y = "Number of Institutions") +
+  theme(axis.text=element_text(size=10), axis.title=element_text(size=10), legend.text=element_text(size=10), legend.title=element_text(size=10)) +
+  labs(caption = "Evans & Furstenberg. NCES IPEDS Survey of Institutional Characteristics 1989-2015.")
 ```
+
+    ## Warning: Removed 3 rows containing missing values (geom_path).
+
+    ## Warning: Removed 3 rows containing missing values (geom_path).
 
 ![Growth of Postsecondary Institutions by Level](graphs/Inst_Growth_by_Level_over_Time-1.png)
-
-``` r
-detach(Inst_Level_table)
-```
 
 As seen in Figure 5, the United States has added new postsecondary institutions throughout the entire timespan of this graph. Of all levels, the four-year sector has added the greatest number of institutions. There were only 1670 in 1980 and in 2015 there were 3161--a 90% increase. Two-year institutions have experienced similar rates of growth, going from 1018 in 1980 to 2195 in 2015 (115% growth). There is less information available on less-than-two-year institutions, but we know that their rate of growth has increased rapidly since the turn of the century. Since 2010 alone, the number of less-than-2-year schools has increased by 30%. Today, 40% of institutions are four-year and the remaining 60% of institutions are evenly split between two-year and less-than-two-year institutions.
 
@@ -297,23 +277,22 @@ As seen in Figure 5, the United States has added new postsecondary institutions 
 There are also important changes to the institutional landscape in terms of institutional control. By control, we mean whether an institution is operated by publicly-elected or appointed officials (public control) or by privately-elected or appointed officials (private control). Institutions of private control derive their funding principally through private sources. There are two types of private control: non-profit and for-profit, depending on how the institution handles surplus revenue. Non-profits use revenue to advance the mission of the institution. For-profits channel revenue to owners.
 
 ``` r
-attach(Inst_Control_table)
-mypalette<-brewer.pal(3, "Set2")
-par(mar=c(9,5,4,2), bg="oldlace")
-plot(YEAR,PUBLIC, ylab="Number of Institutions",xlab="Year", ylim=c(0,3500), main="Growth of Institutions by Control", type="l", col=mypalette[1], lwd=2)
-points(YEAR,PRIVNPROF, col=mypalette[2], type="l", lwd=2)
-points(YEAR,PRIV4PROF, col=mypalette[3], type="l", lwd=2)
-legend(1980,3500,c('Public Institutions','Private Non-profit Institutions','For-Profit Institutions'),lty=c(1,1,1), lwd=c(2.5,2.5,2.5),col=mypalette, cex=1, bg="white")
-mtext("Evans and Furstenberg",side=1,line=3,adj=0,cex=.7,col="black")
-mtext("Source: U.S. Department of Education, National Center for Education Statistics, Integrated \n Postsecondary Education Data System (IPEDS), Survey of Institutional Characteristics.",side=1,line=5,adj=0,cex=.7,col="black")
-mtext("Note: Changes in counts of institutions over time are partly affected by changes in survey design and \n choices of categorization.",side=1,line=6.5,adj=0,cex=.7,col="black")
+Inst_Control_table %>% 
+  gather(CONTROL, COUNT, 2:4) %>% 
+  ggplot(aes(x=YEAR, y=COUNT, group=CONTROL, colour=CONTROL)) + 
+  geom_line() +
+  geom_line(size=1) +
+  scale_color_discrete("Institutional Control", labels = c('For-Profit Institutions','Private Non-profit Institutions', 'Public Institutions')) +
+  labs(title="Growth in Postsecondary Institutions by Control", subtitle= "1980-2015", x="Year", y = "Number of Institutions") +
+  theme(axis.text=element_text(size=10), axis.title=element_text(size=10), legend.text=element_text(size=10), legend.title=element_text(size=10)) +
+  labs(caption = "Evans & Furstenberg. NCES IPEDS Survey of Institutional Characteristics 1980-2015.")
 ```
+
+    ## Warning: Removed 8 rows containing missing values (geom_path).
+
+    ## Warning: Removed 8 rows containing missing values (geom_path).
 
 ![Institutional Growth by Control Over Time](graphs/Inst_Growth_by_Control_over_Time-1.png)
-
-``` r
-detach(Inst_Control_table)
-```
 
 It is clear from Figure 6 that the most dramatic change in institutional control is among private, for-profit institutions. In 1987, there were only 1102 for-profit postsecondary institutions. By 2015, there were 3454--an increase of over 200% in only thirty years. The number of public institutions and private, not-for-profit schools has remained more stable over time (growing very slowly compared to the for-profit sector). For-profit institutions include technical institutes, arts schools, nursing schools, many online programs, some law schools and business schools, to name a few areas. Some have expressed concern that the profit motive inherent to for-profit institutions is at odds with the mission of higher education. Others argue that the for-profit sphere fills in badly needed areas ignored by traditional institutions.
 
@@ -322,22 +301,18 @@ It is clear from Figure 6 that the most dramatic change in institutional control
 Degree-granting institutions offer programs that lead to a terminal degree at the associate’s level or higher. Degree-granting institutions also participate in the Title IV federal financial aid program. Many non-degree-granting institutions do not. Non-degree institutions typically offer certificates of competency, but such awards are not accredited.
 
 ``` r
-attach(Inst_Degree_table)
-mypalette<-brewer.pal(3, "Set1")
-par(mar=c(9,5,4,2), bg="oldlace")
-plot(YEAR,DEGREE, ylab="Number of Institutions",xlab="Year", ylim=c(0,5500), main="Growth of Institutions by Degree-granting Status", type="l", col=mypalette[1], lwd=2)
-points(YEAR,NONDEGREE, col=mypalette[2], type="l", lwd=2)
-legend(1996,5500,c('Degree-granting Institutions','Non-degree-granting Institutions'),lty=c(1,1), lwd=c(2.5,2.5),col=mypalette, cex=1, bg="white")
-mtext("Evans and Furstenberg",side=1,line=3,adj=0,cex=.7,col="black")
-mtext("Source: U.S. Department of Education, National Center for Education Statistics, Integrated \n Postsecondary Education Data System (IPEDS), Survey of Institutional Characteristics.",side=1,line=5,adj=0,cex=.7,col="black")
-mtext("Note: Changes in counts of institutions over time are partly affected by changes in survey design and \n choices of categorization.",side=1,line=6.5,adj=0,cex=.7,col="black")
+Inst_Degree_table %>% 
+  gather(DEGREE, COUNT, 2:3) %>% 
+  ggplot(aes(x=YEAR, y=COUNT, group=DEGREE, colour=DEGREE)) + 
+  geom_line() +
+  geom_line(size=1) +
+  scale_color_discrete("Degree-granting status", labels = c('Degree-granting Institutions','Non-degree-granting Institutions')) +
+  labs(title="Growth in Postsecondary Institutions by Degree-granting Status", subtitle= "1996-2015", x="Year", y = "Number of Institutions") +
+  theme(axis.text=element_text(size=10), axis.title=element_text(size=10), legend.text=element_text(size=10), legend.title=element_text(size=10)) +
+  labs(caption = "Evans & Furstenberg. NCES IPEDS Survey of Institutional Characteristics 1996-2015.")
 ```
 
 ![Institutional Growth by Degree Over Time](graphs/Inst_Growth_by_Degree_over_Time-1.png)
-
-``` r
-detach(Inst_Degree_table)
-```
 
 The educational landscape with regard to degree-granting status has remained fairly stable over the last decades. Both degree-granting and non-degree-granting instutions have increased slowly in number, but their rates of growth are comparable over time. Today, and historically, degree-granting institutions outnumber institutions without accreditation by about two to one.
 
@@ -346,26 +321,18 @@ The educational landscape with regard to degree-granting status has remained fai
 A useful analytic framework for examining postsecondary institutions was developed by the Carnegie Foundation. The basic Carnegie classification framework separates degree-granting institutions into one of six categories, based principally on the type of degrees the institution typically awards. Doctoral institutions are research institutions awarding high numbers of doctorates. These instituitions are often distinguished further by their level of research intensity (where R1 refers to institutions with very high research intensity and R3 means moderate research intensity). Master's, Baccalaureate and Associate's institutions award predominately Master's, Bachelor's and Associate's degrees, respectively. Specialized institutions award a high number of degrees in one particular field or specialty (e.g., the arts, theology, health/medical training). Tribal institutions are schools participating in the American Indian Higher Education Consortium. All Carnegie-classified institutions are degree-granting, meaning that a considerable percentage (one-third) are excluded from Figure 8.
 
 ``` r
-mypalette<-brewer.pal(6, "Set2")
-attach(Inst_Carnegie_table)
-par(mar=c(9,5,4,2), bg="oldlace")
-plot(YEAR,RESDOC, ylab="Number of Institutions",xlab="Year", ylim=c(0,1800), main="Growth of Institutions by Carnegie Classification", type="l", col=mypalette[1], lwd=2)
-points(YEAR,MASTERS, col=mypalette[2], type="l", lwd=2)
-points(YEAR,BAS, col=mypalette[3], type="l", lwd=2)
-points(YEAR,ASSOCS, col=mypalette[4], type="l", lwd=2)
-points(YEAR,SPECIAL, col=mypalette[5], type="l", lwd=2)
-points(YEAR,TRIBAL, col=mypalette[6], type="l", lwd=2)
-legend(2005,1400,c('Doctoral Institutions','Masters Institutions','Baccalaureate Institutions','Associates Institutions','Specialized Institutions','Tribal Institutions'),lty=c(1,1), lwd=c(2.5,2.5),col=c(mypalette), cex=.8, bg="white")
-mtext("Evans and Furstenberg",side=1,line=3,adj=0,cex=.7,col="black")
-mtext("Source: U.S. Department of Education, National Center for Education Statistics, Integrated \n Postsecondary Education Data System (IPEDS), Survey of Institutional Characteristics.",side=1,line=5,adj=0,cex=.7,col="black")
-mtext("Note: Changes in counts of institutions over time are partly affected by changes in survey design and \n changes in Carnegie categories. Carnegie classification only pertains to degree-granting institutions.",side=1,line=6.5,adj=0,cex=.7,col="black")
+Inst_Carnegie_table %>% 
+  gather(CARNEGIE, COUNT, 2:7) %>% 
+  ggplot(aes(x=YEAR, y=COUNT, group=CARNEGIE, colour=CARNEGIE)) + 
+  geom_line() +
+  geom_line(size=1) +
+  scale_color_discrete("Degree-granting status", labels = c('Associates Institutions','Baccalaureate Institutions','Masters Institutions','Doctoral Institutions','Specialized Institutions','Tribal Institutions')) +
+  labs(title="Growth in Postsecondary Institutions by Carnegie Classification", subtitle= "1994-2014", x="Year", y = "Number of Institutions") +
+  theme(axis.text=element_text(size=10), axis.title=element_text(size=10), legend.text=element_text(size=10), legend.title=element_text(size=10)) +
+  labs(caption = "Evans & Furstenberg. NCES IPEDS Survey of Institutional Characteristics 1994-2014.")
 ```
 
 ![Institutional Growth by Carnegie Classification Over Time](graphs/Inst_Growth_by_Carnegie_over_Time-1.png)
-
-``` r
-detach(Inst_Carnegie_table)
-```
 
 Each class of institution in the Carnegie system has grown since the early 1990s. The growth of Bachelor's, Master's and Specialized institutions has been comparable during this time period. There were approximately 500 institutions in each of these categories in the early 1990s and their numbers have increased by about 50% since that time. The growth of Tribal institutions and doctoral institutions has been more moderate. There were 232 doctorate institutions in 1994. In 2014, there were 290. Associate's institutions are the most prevalent institutional class and have also experienced the most growth in recent times. Their numbers increased from 1216 in 1994 to 1708 in 2014. At both time points, Associate's institutions have held about forty percent of the "market share" of degree-granting institutions.
 
@@ -374,24 +341,20 @@ Each class of institution in the Carnegie system has grown since the early 1990s
 Finally, we examine the use of tenure systems in postsecondary education. Historically, virtually every institution held a body of permanent faculty with tenured contracts. It is well-known that the number of tenure systems as declined over time. In the following figure, we document this trend in schools by institutional sector (level and control).
 
 ``` r
-mypalette<-brewer.pal(5, "Set1")
-attach(Inst_Ten_table)
-par(mar=c(7,4.5,4,2), bg="oldlace")
-plot(YEAR,PUB4YRTOTAL, ylab="Percent",xlab="Year",main="Percent of Institutions with Tenure Systems, by Sector", type="l", col=mypalette[1], ylim=c(0,100), lwd=2)
-points(YEAR, PUB2YR, type="l", col=mypalette[2], lwd=2)
-points(YEAR, NONPROF4YRTOTAL, type="l", col=mypalette[3], lwd=2)
-points(YEAR, NONPROF2YR, type="l", col=mypalette[4], lwd=2)
-points(YEAR, FORPROF, type="l", col=mypalette[5], lwd=2)
-mtext("Evans and Furstenberg",side=1,line=3,adj=0,cex=.7,col="black")
-mtext("Source: U.S. Department of Education, National Center for Education Statistics, Integrated \n Postsecondary Education Data System (IPEDS), Survey of Institutional Characteristics.",side=1,line=5,adj=0,cex=.7,col="black")
-legend(2004,50,c("Public, 4-Yr. Institutions", "Public, 2-Yr. Institutions","Private, 4-Yr. Institutions","Private 2-Yr., Institutions","Private, For-profit Institutions"),lty=c(1,1), lwd=c(2.5,2.5),col=mypalette, cex=.75, bg="white")
+Tenure_Sector_table %>%
+  filter(UNIT=="INST") %>% 
+  gather(TENURE, PCT, 2:15)  %>% 
+  filter(TENURE %in% c("FORPROF","PUB4YRTOTAL","PUB2YR","NONPROF4YRTOTAL","NONPROF2YR")) %>%
+  ggplot(aes(x=YEAR, y=PCT, group=TENURE, colour=TENURE)) + 
+  geom_line() +
+  geom_line(size=1) +
+  scale_color_discrete("Institutional Sector", labels = c("For-profit", "Non-Profit 2-Year", "Non-profit 4-Year", "Public 2-Year", "Public 4-Year")) +
+  labs(title="Percent of Institutions with Tenure Systems, by Sector", subtitle= "1993-2015", x="Year", y = "Percent of Institutions") +
+  theme(axis.text=element_text(size=10), axis.title=element_text(size=10), legend.text=element_text(size=10), legend.title=element_text(size=10)) +
+  labs(caption = "Evans & Furstenberg. NCES IPEDS Survey of Institutional Characteristics 1993-2015.")
 ```
 
 ![Percent of Institutions with Tenure Systems, by Sector](graphs/Pct_Inst_w_Tenure_Sys_over_Time-1.png)
-
-``` r
-detach(Inst_Ten_table)
-```
 
 From Figure 9, it is clear that institutions vary greatly in their use (or non-use) of tenure systems. Only a small fraction of for-profit institutions utilize a tenure system for managing permanent employees. Public, four-year instiutions, on the other hand, commonly do utilize a tenure system. The use of tenure systems in other institutional types, however, does seem to be on a very slow decline. In general, tenure systems seem to be disappearing, although the rate of disappearance may have flattened out in recent times.
 
@@ -404,19 +367,21 @@ Second, some institutional types have grown more than others and it is worth hig
 The other important area of prominent growth has been less-than-two-year institutions. Not only has their number increased in recent times, but their growth has been accelerating over the last decade and a half. Today, there are as many less-than-two-year institutions as there are traditional two-year institutions. Some of these programs result in a terminal degree, but many no doubt simply provide an unaccredited certificate. It is not clear what the reasons are for this growth, nor what the consequences will be. Nearly a third of institutions today are less-than-two-year institutions.
 
 ``` r
-table<-Delta_Crosstable*100
-rownames(table)<-c("Four-year","Two-year","Less-than-two-year")
-colnames(table)<-c("Public","Private Non-profit","For-profit")
-kable(table, caption = "Crosstabulation of Level and Control (in percentages)", fig.align="center")
+Delta_Crosstable %>%
+  `*`(100) %>%
+  round(1) %>%
+  `colnames<-`(c("Public","Private Non-profit","For-profit")) %>%
+  `rownames<-`(c("Four-year","Two-year","Less-than-two-year")) %>%
+  kable(caption = "Crosstabulation of Level and Control (in percentages)", fig.align="center")
 ```
 
 |                    |  Public|  Private Non-profit|  For-profit|
 |--------------------|-------:|-------------------:|-----------:|
-| Four-year          |    7.18|               21.81|        4.48|
-| Two-year           |   12.02|                4.85|        9.97|
-| Less-than-two-year |    3.22|                2.98|       33.48|
+| Four-year          |    55.9|                10.9|        30.8|
+| Two-year           |    34.7|                85.8|        14.3|
+| Less-than-two-year |     9.5|                 3.3|        54.9|
 
-A simple crosstabluation of institutional level and institutional control reveals how interrelated the for-profit sector is with less-than-two-year institutions. Examing row sums, 84% of less-than-two-year institutions are for-profit. Or alternatively, 70% of for-profit institutions are less-than-two-year (column sum). Clearly, the for-profit, 2-year sector is a growing and important player on the stage of higher education.
+A simple crosstabluation of institutional level and institutional control reveals how interrelated the for-profit sector is with less-than-two-year institutions. Examing row sums, 81% (18.6/(18.6+1 + 3.4)) of less-than-two-year institutions are for-profit. Or alternatively, 55% (54.9/(54.9+14.3+30.8)) of for-profit institutions are less-than-two-year (column sum). Clearly, the for-profit, 2-year sector is a growing and important player on the stage of higher education.
 
 Reining in Postsecondary Expenses
 =================================
@@ -431,27 +396,34 @@ Tenure and Full-time status of Faculty
 To begin with, we examine the proportion of non-tenure track faculty across all institutions in the United States. We also factor in the full-time or part-time status of adjuncts, as this is known to be important to the tenure system. Before interpreting Figure 10, however, it is important to consider the improbable dip or shift occuring between 2011 and 2012 in this graph. It is unclear why such a pattern came about, however, it might be related to a major change made in how occupations were classified since 2012. The Department of Education made these changes in order to align the Human Resources component of IPEDS with the 2010 Standard Occupational Classification (SOC) System. In the following paragraphs, we will try to identify patterns as best we can.
 
 ``` r
-options(digits = 3,scipen=999) # turn off Scientific Notation
-mypalette<-brewer.pal(4, "Set2")
-# Tenure_table[11:14,"PT"]<-c(45.7, 45.6, 45.6, 45.2) # add 3
-# Tenure_table[11:14,"FTNTT"]<-c(21.5, 21.2, 21.4, 21.7) # subtract 3
-attach(Tenure_table)
-par(mar=c(9,5,4,2), bg="oldlace")
-plot(YEAR,FTTEN, ylab="Percent of Faculty",xlab="Year",main="Percentage of Faculty Types in Postsecondary Education", type="l",ylim=c(0,65), col=mypalette[1],lwd=2)
-points(YEAR,FTTRACK, type="l",col=mypalette[2],lwd=2)
-points(YEAR,FTNTT, type="l",col=mypalette[3],lwd=2)
-points(YEAR,PT, type="l",col=mypalette[4],lwd=2)
-legend(2002,65,c('Full-time Tenured','Full-time Tenure-Track', 'Full-time Non-Tenure/Track','Part-time Faculty'),lty=c(1,1,1,1), lwd=c(2.5,2.5,2.5,2.5),col=mypalette, cex=.9, bg="white")
-mtext("Evans & Furstenberg",side=1,line=3,adj=0,cex=.7,col="black")
-mtext("Source: U.S. Department of Education, National Center for Education Statistics, Integrated \n Postsecondary Education Data System (IPEDS).  Survey of Employees by faculty status, primary \n function/occupational activity: 2002-2015.",side=1,line=5.5,adj=0,cex=.7,col="black")
-mtext("Note: All U.S.-based, postsecondary employees with faculty status in every field.",side=1,line=6.5,adj=0,cex=.7,col="black")
+Tenure_Sector_table %>%
+  filter(UNIT=='FACULTY') %>% 
+  gather(TENURE, PCT, 2:15) %>% 
+  filter(TENURE %in% c("FORPROF","PUB4YRTOTAL","PUB2YR","NONPROF4YRTOTAL","NONPROF2YR")) %>%
+  ggplot(aes(x=YEAR, y=PCT, group=TENURE, colour=TENURE)) + 
+  geom_line() +
+  geom_line(size=1) +
+  scale_color_discrete("Institutional Sector", labels = c("For-profit", "Non-Profit 2-Year", "Non-profit 4-Year", "Public 2-Year", "Public 4-Year")) +
+  labs(title="Percent of Full-time Faculty with Tenure, by Sector", subtitle= "1993-2015", x="Year", y = "Percent of Full-time Faculty") +
+  theme(axis.text=element_text(size=10), axis.title=element_text(size=10), legend.text=element_text(size=10), legend.title=element_text(size=10)) +
+  labs(caption = "Evans & Furstenberg. NCES IPEDS Survey of Institutional Characteristics 1993-2015.")
 ```
 
-![Percentage of Faculty Types in Postsecondary Education (IPEDS)](graphs/IPEDS_Tenure_Pct_over_Time-1.png)
+![Percentage Tenured Faculty in Postsecondary Education (IPEDS)](graphs/IPEDS_Tenure_Pct_over_Time-1.png)
 
 ``` r
-detach(Tenure_table)
+Tenure_Status_table %>%
+  gather(STATUS, PCT, 2:5) %>%
+  ggplot(aes(x=YEAR, y=PCT, group=STATUS, colour=STATUS)) +
+  geom_line() +
+  geom_line(size=1) +
+  scale_color_discrete("Institutional Sector", labels = c('Full-time Non-Tenure/Track','Full-time Tenured','Full-time Tenure-Track','Part-time Faculty')) +
+  labs(title="Percentage of Faculty Types in Postsecondary Education", subtitle= "2002-2015", x="Year", y = "Percent of Faculty") +
+  theme(axis.text=element_text(size=10), axis.title=element_text(size=10), legend.text=element_text(size=10), legend.title=element_text(size=10)) +
+  labs(caption = "Evans & Furstenberg. NCES IPEDS Survey of Employees by Assigned Position (EAP), primary function/occupational activity 2002-2015.")
 ```
+
+![Percentage of Faculty Types in Postsecondary Education (IPEDS)](graphs/IPEDS_Facclass_Pct_over_Time-1.png)
 
 Figure 10 shows two general patterns over time. First, part-time work is on the rise in academia. This has been a well-recognized pattern since as early as the 1970s. However, the trend has also carried over well into the twenty-first century. In the figure, we see that the proportion of part-time faculty increased from 41.5% in 2002 to 42.2% in 2014. Admittedly, this is a small difference. However, changes made to the 2012 instruemnt (and after) probably mitigated the true growth of part-time labor during this period. Up until 2012, the proportion of part-time faculty was clearly climbing. In fact, 47% of faculty were part-time in 2011, just before the survey was changed. As a result, we believe that the trend may be stronger than indicated in the figure.
 
@@ -460,22 +432,17 @@ Secondly, the proportion of non-tenure track faculty is clearly increasing. 63% 
 Contracts of non-tenure track faculty take different forms. Some non-tenure track faculty hold multi-year contracts, which may give them the sense of permanence or belonging in their institutions. However, multi-year contracts are rare. Most adjuncts work under contracts renewed on an annual basis. This is true for full-time adjuncts and part-time adjuncts.
 
 ``` r
-attach(FTPTdf)
-par(bg = "oldlace")
-par(mar=c(8,5,4,2), bg="oldlace")
-rownames(FTPTdf)<-c("Tenure/Track \n Contracts","Multi-year \n Contracts","Annual \n Contracts","Non-faculty or \n Non-tenure Inst.")
-barplot(t(as.matrix(FTPTdf)), beside=T, col=c("blue","red"), ylab="Number of Instructors", main="Instructional Faculty Contracts in 2013")
-legend("topright",c("Full-time","Part-time"),pch=15,col=c('blue','red'), cex=1, bg="white")
-mtext("Evans & Furstenberg",side=1,line=3,adj=0,cex=.7,col="black")
-mtext("Source: U.S. Department of Education, National Center for Education Statistics, Integrated \n Postsecondary Education Data System (IPEDS) 2013.",side=1,line=4.5,adj=0,cex=.7,col="black")
-mtext("Note: Instructional faculty only.",side=1,line=5.5,adj=0,cex=.7,col="black")
+Contract_table %>% 
+  gather(FTSTATUS,COUNT,1:2) %>%
+  ggplot(aes(x=CLASS, y=COUNT, fill=FTSTATUS)) + 
+  geom_bar(stat="identity", position="dodge") +
+  scale_x_discrete(labels = c("Annual \n Contracts","Multi-year \n Contracts","Non-faculty or \n Non-tenure Inst.","Tenure/Track \n Contracts")) +
+  scale_fill_manual("", values = c("blue", "red"), labels=c("Full-time", "Part-time")) +
+  labs(title = "Instructional Faculty Contracts in 2013", y = "Number of Instructors", x="Faculty Class", caption = "Evans & Furstenberg. NCES IPEDS Finance Component (Delta Project) 2013.") +
+  theme(panel.background = element_rect(fill = 'aliceblue', colour = 'black'))
 ```
 
 ![Faculty Contracts in 2013](graphs/Faculty_Contracts_2013-1.png)
-
-``` r
-detach(FTPTdf)
-```
 
 In the following sections, we examine more closely the growth of non-tenure track faculty across important aspects of postsecondary institutions. Specifically, we examine the distribution of adjuncts in institutions based on their level, control, degree-granting status and Carnegie classification. We also look at the role of tenure status in administration and clinical/medical positions. We then turn to other datasets (SDR and HERI) that allow us to examine other important relationships.
 
@@ -484,120 +451,85 @@ In the following sections, we examine more closely the growth of non-tenure trac
 IPEDS shows that the percentage of non-tenure track faculty has increased in every institutional level (4-year, 2-year and less-than-2-year). The most apparent growth is in less-than-two-year institutions. In 2002, 70% of faculty in these institutions were non-tenure track. By 2007, tenured faculty had virtually disappeared from all less-than-two-year institutions. Two-year and four-year institutions have also experienced increases in their percentage of non-tenure track faculty members; albeit more moderate growth. Just over 60% percent of faculty in four-year institutions work under contingent contracts today. Eighty percent of faculty in two-year schools are non-tenure track.
 
 ``` r
-attach(Level_Ten_table)
-mypalette<-brewer.pal(3, "Set1")
-par(mar=c(9,5,4,2), bg="oldlace")
-plot(YEAR,PCT_4YR_NTT, ylab="Percent Non-tenure",xlab="Year",main="Percent Non-tenured Faculty by Institutional Level", type="l", col=mypalette[1], ylim=c(35,100), lwd=2)
-points(YEAR,PCT_24_NTT, col=mypalette[2], type="l", lwd=2)
-points(YEAR,PCT_LESS2_NTT, col=mypalette[3], type="l", lwd=2)
-legend(2002,50, c('Four Year Institutions','Two-Year Institutions','Less than Two-Year Institutions'),lty=c(rep(1,3)), lwd=c(rep(2.5,3)),col=mypalette, cex=1, bg="white")
-mtext("Evans & Furstenberg",side=1,line=3,adj=0,cex=.7,col="black")
-mtext("Source: U.S. Department of Education, National Center for Education Statistics, Integrated \n Postsecondary Education Data System (IPEDS).  Survey of Employees by faculty status, primary \n function/occupational activity: 2002-2015.",side=1,line=5.5,adj=0,cex=.7,col="black")
-mtext("Note: All U.S.-based, postsecondary employees with faculty status in every field.",side=1,line=6.5,adj=0,cex=.7,col="black")
+Level_Ten_table %>%
+  ggplot(aes(x=YEAR, y=PCTNTT, group=LEVEL, colour=LEVEL)) +
+  geom_line() +
+  geom_line(size=1) +
+  scale_color_discrete("Institutional Level", labels = c('Two-Year Institutions','Four Year Institutions','Less than Two-Year Institutions')) +
+  labs(title="Percent Non-tenured Faculty by Institutional Level", subtitle= "2002-2015", x="Year", y = "Percent Non-tenure") +
+  theme(axis.text=element_text(size=10), axis.title=element_text(size=10), legend.text=element_text(size=10), legend.title=element_text(size=10)) +
+  labs(caption = "Evans & Furstenberg. \n NCES IPEDS Survey of Employees by Faculty Status, primary function/occupational activity 2002-2015. \n All U.S.-based, postsecondary employees with faculty status in every field")
 ```
 
 ![Percent Non-Tenure Track by Institutional Level](graphs/PCT_NTT_by_Level-1.png)
-
-``` r
-detach(Level_Ten_table)
-```
 
 ### Growing Percentages of Non-tenure Track Faculty by Institutional Control
 
 The percentage of faculty working off the tenure track has also increased in public, private non-profit, and for-profit institutions. The pattern is most clear for faculty working in private, for-profit institutions. Just over 90% of for-profit faculty were off the tenure track at the turn of the century. Virtually all for-profit faculty today work off the tenure track. The percentage of non-tenure track faculty has been quite similar between public institutions and private, non-profit institutions. There has been a gradual increase in the percentage of non-tenure track faculty since the earliest time period we examined in our data. Around 60% were non-tenure track in 2002. About 65% are non-tenure today in these kinds of institutions.
 
 ``` r
-mypalette<-brewer.pal(3, "Set2")
-attach(Inst_Control_Ten_table)
-par(mar=c(9,5,2,2), bg="old lace")
-plot(YEAR,PCT_4PROF_NTT, ylab="Percent",xlab="Year",main="Percent Nontenured Faculty by Institutional Control", type="l", col=mypalette[1], ylim=c(40,100), lwd=2)
-points(YEAR,PCT_NONPROF_NTT, col=mypalette[2], type="l", lwd=2)
-points(YEAR,PCT_PUB_NTT, col=mypalette[3], type="l", lwd=2)
-legend(2002,85,c('For-Profit Institutions','Non-Profit Institutions','Public Institutions'),lty=c(rep(1,3)), lwd=c(rep(2.5,3)),col=mypalette, cex=1, bg="white")
-mtext("Evans & Furstenberg",side=1,line=3,adj=0,cex=.8,col="black")
-mtext("Source: U.S. Department of Education, National Center for Education Statistics, Integrated \n Postsecondary Education Data System (IPEDS).  Survey of Employees by faculty status, \n primary function/occupational activity: 2002-2015.",side=1,line=6,adj=0,cex=.75,col="black")
+Inst_Control_Ten_table %>%
+  ggplot(aes(x=YEAR, y=PCTNTT, group=CONTROL, colour=CONTROL)) +
+  geom_line() +
+  geom_line(size=1) +
+  scale_color_discrete("Institutional Control", labels = c('For-Profit Institutions','Non-Profit Institutions','Public Institutions')) +
+  labs(title="Percent Non-tenured Faculty by Institutional Control", subtitle= "2002-2015", x="Year", y = "Percent Non-tenure") +
+  theme(axis.text=element_text(size=10), axis.title=element_text(size=10), legend.text=element_text(size=10), legend.title=element_text(size=10)) +
+  labs(caption = "Evans & Furstenberg. \n NCES IPEDS Survey of Employees by Faculty Status, primary function/occupational activity 2002-2015. \n All U.S.-based, postsecondary employees with faculty status in every field")
 ```
 
 ![Percent Non-Tenure Track by Institutional Control](graphs/PCT_NTT_by_Control-1.png)
-
-``` r
-detach(Inst_Control_Ten_table)
-```
 
 ### Growing Percentages of Non-tenure Track Faculty by Institutional Degree-granting Status
 
 There are clearly recognizable patterns among faculty working in degree-granting institutions and those not offering degrees (Figure 14). In 2002, over 70% of non-degree (institutional) faculty were off the tenure track. This figure reached its ceiling (100%) less than a decade later. Already by 2007, only a small fraction of faculty in non-degree-granting institutions were tenured or on the tenure track. The growth of adjuncts in degree-granting institutions has risen much more modestly over the last decade and a half. Non-tenure track faculty are now approaching two-thirds of the faculty workforce in degree-granting institutions.
 
 ``` r
-attach(Degree_Inst_Ten_table)
-mypalette<-brewer.pal(2, "Set1")
-```
-
-    ## Warning in brewer.pal(2, "Set1"): minimal value for n is 3, returning requested palette with 3 different levels
-
-``` r
-par(mar=c(9,5,4,2), bg="oldlace")
-plot(YEAR,PCT_DEGREE_NONTENURE, ylab="Percent Non-tenure",xlab="Year",main="Percent Non-tenured Faculty by Degree-Granting Status", type="l", col=mypalette[1], ylim=c(50,100), lwd=2)
-points(YEAR,PCT_NONDEGREE_NONTENURE, col=mypalette[2], type="l", lwd=2)
-legend(2006,60,c('Degree-Granting Institutions','Non-Degree-Granting Institutions'),lty=c(rep(1,2)), lwd=c(rep(2.5,2)),col=mypalette, cex=1, bg="white")
-mtext("Evans & Furstenberg",side=1,line=3,adj=0,cex=.7,col="black")
-mtext("Source: U.S. Department of Education, National Center for Education Statistics, Integrated \n Postsecondary Education Data System (IPEDS).  Survey of Employees by faculty status, primary \n function/occupational activity: 2002-2015.",side=1,line=5.5,adj=0,cex=.7,col="black")
-mtext("Note: All U.S.-based, postsecondary employees with faculty status in every field.",side=1,line=6.5,adj=0,cex=.7,col="black")
+Degree_Inst_Ten_table %>%
+  ggplot(aes(x=YEAR, y=PCTNTT, group=DEGREE, colour=DEGREE)) +
+  geom_line() +
+  geom_line(size=1) +
+  scale_color_discrete("Institutional Control", labels = c('Degree-Granting','Non-Degree Granting')) +
+  labs(title="Percent Non-tenured Faculty by Degree-granting Status", subtitle= "2002-2015", x="Year", y = "Percent Non-tenure") +
+  theme(axis.text=element_text(size=10), axis.title=element_text(size=10), legend.text=element_text(size=10), legend.title=element_text(size=10)) +
+  labs(caption = "Evans & Furstenberg. \n NCES IPEDS Survey of Employees by Faculty Status, primary function/occupational activity 2002-2015. \n All U.S.-based, postsecondary employees with faculty status in every field")
 ```
 
 ![Percent Non-tenure Track by Degree Granting Status](graphs/PCT_NTT_by_Degree_Granting_Status_over_Time-1.png)
-
-``` r
-detach(Degree_Inst_Ten_table)
-```
 
 ### Growing Percentages of Non-tenure Track Faculty by Carnegie Class
 
 It is clear from Figure 15 that the portion of non-tenure track faculty is increasing at every Carnegie type. Potentially, the proportion of non-tenure track faculty at Associate's institutions has leveled off over the last five years, but more data would be necessary to confirm this. Institutions granting greater numbers of higher degrees (Bachelor's, Master's and Doctorates) are employing higher proportions of faculty off the tenure track. Roughly half of faculty in these institutions were non-tenure track in 2002. That proportion has grown by 6-7 percent since 2002. Faculty at "Other" institutions also tend to be, increasingly, non-tenure track faculty. "Other" institutions include specialized institutions that focus on limited fields (e.g., Art and Music schools, some business schools and medical institutions). They also include schools associated with the American Indian Higher Education Consortium (Tribal schools). Nearly 80% of faculty work off the tenure track in these schools, an increase of around 10% since 2002.
 
 ``` r
-attach(Carnegie_Ten_table)
-mypalette<-brewer.pal(4, "Set2")
-par(mar=c(9,5,4,2), bg="oldlace")
-plot(YEAR,PCT_ASSC_NTT, ylab="Percent Non-tenure",xlab="Year",main="Percent Non-tenured Faculty by Carnegie Classification", type="l", col=mypalette[1], ylim=c(40,100), lwd=2)
-points(YEAR,PCT_BMD_NTT, col=mypalette[2], type="l", lwd=2)
-points(YEAR,PCT_RESEARCH_NTT, col=mypalette[3], type="l", lwd=2)
-points(YEAR,PCT_OTH_NTT, col=mypalette[4], type="l", lwd=2)
-legend(2002,100, c('Associates Institutions','Baccalaureate/Masters Institutions','Doctoral Institutions','Other'),lty=c(rep(1,4)), lwd=c(rep(2.5,4)),col=mypalette, cex=.9, bg="white")
-mtext("Evans & Furstenberg",side=1,line=3,adj=0,cex=.7,col="black")
-mtext("Source: U.S. Department of Education, National Center for Education Statistics, Integrated \n Postsecondary Education Data System (IPEDS).  Survey of Employees by faculty status, primary \n function/occupational activity: 2002-2015.",side=1,line=5.5,adj=0,cex=.7,col="black")
-mtext("Note: All U.S.-based, postsecondary employees with faculty status in every field.",side=1,line=6.5,adj=0,cex=.7,col="black")
+Carnegie_Ten_table1 %>%
+  ggplot(aes(x=YEAR, y=PCTNTT, group=CARNEGIE1, colour=CARNEGIE1)) +
+  geom_line() +
+  geom_line(size=1) +
+  scale_color_discrete("Carnegie Status", labels = c('Associates Institutions','Baccalaureate/Masters Institutions','Research Institutions','Other')) +
+  labs(title="Percent Non-tenured Faculty by Carnegie Classification", subtitle= "2002-2015", x="Year", y = "Percent Non-tenure") +
+  theme(axis.text=element_text(size=10), axis.title=element_text(size=10), legend.text=element_text(size=10), legend.title=element_text(size=10)) +
+  labs(caption = "Evans & Furstenberg. \n NCES IPEDS Survey of Employees by Faculty Status, primary function/occupational activity 2002-2015. \n All U.S.-based, postsecondary employees with faculty status in every field")
 ```
 
 ![Percent Non-Tenure Track by Carnegie Status](graphs/PCT_NTT_by_Carnegie_Class_over_Time-1.png)
-
-``` r
-detach(Carnegie_Ten_table)
-```
 
 ### Growing Percentages of Non-tenure Track Faculty by Research Intensity.
 
 Often, the Carnegie classification of doctoral instiutions includes their level of research intensity. Doctoral institutions with high research activity are referred to as "R1" and doctoral institutions of moderate research intensity are "R3" institutions. There are also "R2" institutions in between. An important question is how the hiring of non-tenure track faculty may impact the research goals and capabilities of higher education. The following figure explores whether the significant change in faculty contracts is any differnt in institutions of different research intensities.
 
 ``` r
-attach(Carnegie_Res_Ten_table)
-mypalette<-brewer.pal(4, "Set1")
-par(mar=c(9,5,4,2), bg="oldlace")
-plot(YEAR,PCT_R1_NTT, ylab="Percent Non-tenure",xlab="Year",main="Percent Non-tenured Faculty by Carnegie Research Intensity", type="l", col=mypalette[1], ylim=c(30,100), lwd=2)
-points(YEAR,PCT_R2_NTT, col=mypalette[2], type="l", lwd=2)
-points(YEAR,PCT_R3_NTT, col=mypalette[3], type="l", lwd=2)
-points(YEAR,PCT_NR_NTT, col=mypalette[4], type="l", lwd=2)
-legend(2002,100, c('Very High Research Intensity (R1)','High Research Intensity (R2)','Moderate Research Intensity (R3)','Non-research Institution'),lty=c(rep(1,4)), lwd=c(rep(2.5,4)),col=mypalette, cex=.9, bg="white")
-mtext("Evans & Furstenberg",side=1,line=3,adj=0,cex=.7,col="black")
-mtext("Source: U.S. Department of Education, National Center for Education Statistics, Integrated \n Postsecondary Education Data System (IPEDS).  Survey of Employees by faculty status, primary \n function/occupational activity: 2002-2015.",side=1,line=5.5,adj=0,cex=.7,col="black")
-mtext("Note: All U.S.-based, postsecondary employees with faculty status in every field.",side=1,line=6.5,adj=0,cex=.7,col="black")
+Carnegie_Ten_table2 %>%
+  ggplot(aes(x=YEAR, y=PCTNTT, group=CARNEGIE2, colour=CARNEGIE2)) +
+  geom_line() +
+  geom_line(size=1) +
+  scale_color_discrete("Carnegie Status", labels = c('Non-research Institution','Moderate Research Intensity (R3)','Very High Research Intensity (R1)','High Research Intensity (R2)')) +
+  labs(title="Percent Non-tenured Faculty by Carnegie Research Classification", subtitle= "2002-2015", x="Year", y = "Percent Non-tenure") +
+  theme(axis.text=element_text(size=10), axis.title=element_text(size=10), legend.text=element_text(size=10), legend.title=element_text(size=10)) +
+  labs(caption = "Evans & Furstenberg. \n NCES IPEDS Survey of Employees by Faculty Status, primary function/occupational activity 2002-2015. \n All U.S.-based, postsecondary employees with faculty status in every field")
 ```
 
 ![Percent Non-Tenure Track by Research Intensity](graphs/PCT_NTT_by_Carnegie_Research_Intensity_over_Time-1.png)
-
-``` r
-detach(Carnegie_Res_Ten_table)
-```
 
 As seen in Figure 16, regardless of research intensity, the proportion of adjuncts is increasing in all research typologies. R1 and R2 institutions are quite similar with regard to the time trend. Adjuncts were a slight minority in 2002 and they are a slight majority today. The proportion of adjuncts in R3 institutions is increasing a bit more rapidly. There was a comparable proportion of adjuncts in R3 institutions (as in R1 and R2 institutions) in 2002. However, the increased hiring of adjuncts in R3 institutions has made them constitute over 60% of the faculty body today in those institutions. Non-research institutions have also increased the portion of their faculty working off the tenure track, however changes have been more modest. Currently, 70% of faculty at non-research institutions are contingent.
 
@@ -606,26 +538,17 @@ As seen in Figure 16, regardless of research intensity, the proportion of adjunc
 Some have expressed concern that students attending less selective postsecondary institutions are more likely to have non-tenure track faculty. Such an event has implications for the stratification of educational opportunity. Using data from IPEDS, we examine this question. We divided postsecondary institutions into those using admissions testing and those that did not ("non-selective"). Then, among the schools using entrance examinations, we divided them into "most selective","highly selective", "very selective","selective" and "less selective", according to whether the schools' entering freshmen were in the 95th, 85th, 75th, 50th or lower percentile, respectively.
 
 ``` r
-attach(Inst_Select_Pct_NTT_table)
-mypalette<-brewer.pal(6, "Set2")
-par(mar=c(9,4.5,4,2), bg="oldlace")
-plot(YEAR,most_selective, ylab="Percent Non-tenure",xlab="Year",main="Percent Non-tenured Faculty by Institutional Selectivity", type="l", col=mypalette[1], ylim=c(40,80), lwd=2.5)
-points(YEAR,highly_selective, col=mypalette[2], type="l", lwd=2.5)
-points(YEAR,very_selective, col=mypalette[3], type="l", lwd=2.5)
-points(YEAR,selective, col=mypalette[4], type="l", lwd=2.5)
-points(YEAR,Less_selective, col=mypalette[5], type="l", lwd=2.5)
-points(YEAR,Non_selective, col=mypalette[6], type="l", lwd=2.5)
-legend(2002,80, c('Most Selective','Highly Selective','Very Selective','Selective','Less Selective','Non-Selective'),lty=c(rep(1,6)), lwd=c(rep(2.5,6)),col=mypalette, cex=.9, bg="white")
-mtext("Evans & Furstenberg",side=1,line=3,adj=0,cex=.7,col="black")
-mtext("Source: U.S. Department of Education, National Center for Education Statistics, Integrated \n Postsecondary Education Data System (IPEDS).  Survey of Employees by faculty status, primary \n function/occupational activity: 2002-2015. Admissions and Test Scores Component 2015.",side=1,line=5.5,adj=0,cex=.7,col="black")
-mtext("Note: Non-Selective instiutions are those not requiring/reporting SAT or ACT composite scores \n of their entering freshmen class.",side=1,line=7,adj=0,cex=.7,col="black")
+Inst_Select_Pct_NTT_table %>%
+  ggplot(aes(x=YEAR, y=PCTNTT, group=SAT_75THF, colour=SAT_75THF)) +
+  geom_line() +
+  geom_line(size=1) +
+  scale_color_discrete("Selectivity", labels = c('Less Selective','Selective','Very Selective','Most Selective','Non-selective')) +
+  labs(title="Percent Non-tenured Faculty by Institutional Selectivity", subtitle= "2002-2015", x="Year", y = "Percent Non-tenure") +
+  theme(axis.text=element_text(size=10), axis.title=element_text(size=10), legend.text=element_text(size=10), legend.title=element_text(size=10)) +
+  labs(caption = "Evans & Furstenberg. \n NCES IPEDS Survey of Employees by Faculty Status, primary function/occupational activity 2002-2015. Admissions and Test Scores Component 2015. \n All U.S.-based, postsecondary employees with faculty status in every field. \n Non-Selective instiutions are those not requiring/reporting SAT or ACT composite scores of their entering freshmen class.")
 ```
 
 ![Percent Non-Tenure Track by Institutional Selectivity](graphs/PCT_NTT_by_Selectivity-1.png)
-
-``` r
-detach(Inst_Select_Pct_NTT_table)
-```
 
 From Figure 17, we find that, among institutions that report or require entrance examinations (SAT Math/Reading or ACT composite), there was little variation in the percentage of non-tenure track faculty. Whether a school's entering freshmen were in the 95th percentile or some lower selective tier, adjuncts constituted about half the faculty. This portion has risen by about five percent over the course of thirteen years. Today, a slight majority of faculty are non-tenure track in schools using entrance examinations.
 
@@ -637,24 +560,18 @@ Growth in Administrative Positions for Adjuncts
 It is well known that the administrative overhead has expanded greatly in higher education over the last decades. Rather than allocate administrative decision-making to faculty in academic departments, formal positions were created to handle administration on a full-time basis. Many administrators draw larger salaries and more generous benefits packages than academic faculty and some have claimed that the rising cost of higher education is linked to having to pay for the expanding administrative overhead. In this logic, colleges and universities may increasingly utilize non-tenure track academics to handle administrative jobs and tasks. In Figure 18, we examine the role of non-tenure track faculty in adminstrative positions.
 
 ``` r
-attach(Admin_Tenure_table)
-mypalette<-brewer.pal(4, "Set1")
-par(mar=c(9,5,4,2), bg="oldlace")
-plot(YEAR,FTNONFACMGMT, ylab="Percent",xlab="Year",main="Tenure and Faculty Status of Postsecondary \n Administrators and Management", type="l", col=mypalette[1], ylim=c(0,100), lwd=2)
-points(YEAR,PTNONFACMGMT, col=mypalette[2], type="l", lwd=2)
-points(YEAR,FTTENTRACK, col=mypalette[3], type="l", lwd=2)
-points(YEAR,FTNTT, col=mypalette[4], type="l", lwd=2)
-legend(2002,60, c('Full-time Non-faculty','Part-time Non-faculty','Full-time Tenure/Track Faculty','Full-time Non-tenure Track Faculty'),lty=c(rep(1,4)), lwd=c(rep(2.5,4)),col=mypalette, cex=1, bg="white")
-mtext("Evans & Furstenberg",side=1,line=3,adj=0,cex=.7,col="black")
-mtext("Source: U.S. Department of Education, National Center for Education Statistics, Integrated \n Postsecondary Education Data System (IPEDS).  Survey of Employees by faculty status, primary \n function/occupational activity: 2002-2015.",side=1,line=5.5,adj=0,cex=.7,col="black")
-mtext("Note: All U.S.-based, postsecondary employees.  Excludes small number of Part-time faculty.",side=1,line=6.5,adj=0,cex=.7,col="black")
+Admin_Tenure_table %>%
+  gather(STATUS, PCT, 2:5) %>%
+  ggplot(aes(x=YEAR, y=PCT, group=STATUS, colour=STATUS)) +
+  geom_line() +
+  geom_line(size=1) +
+  scale_color_discrete("Faculty Class", labels = c('Full-time Non-faculty Mgmt','Full-time NTT','Full-time Tenure/Track','Part-time Mgmt')) +
+  labs(title="Tenure and Faculty Status of Postsecondary \n Administrators and Management", subtitle= "2002-2015", x="Year", y = "Percent of Management") +
+  theme(axis.text=element_text(size=10), axis.title=element_text(size=10), legend.text=element_text(size=10), legend.title=element_text(size=10)) +
+  labs(caption = "Evans & Furstenberg. NCES IPEDS Survey of Employees by Assigned Position (EAP), primary function/occupational activity 2002-2015.")
 ```
 
 ![Percent Non-Tenure Track by Administrative Role](graphs/PCT_NTT_by_Admin-1.png)
-
-``` r
-detach(Admin_Tenure_table)
-```
 
 Figure 18 suggests that adjuncts do not have an increasingly important role in management. In fact, workers classified as "faculty" in general are not involved in administration. Only a fifth of administrators have the classification of "faculty." This may be because faculty simply are not used extensively in an administrative capacity. Alternatively, institutions may not classify academics as "faculty" once taking on extensive roles in administration or management outside of their home department. Clarification on this topic would be important to fully answer questions regarding the role of faculty adjuncts in higher education administration. In any case, IPEDS data suggests that the work of administration is principally done by individuals working full-time in a non-faculty capacity. There may even be a slight decrease in the role faculty in postsecondary administration over time, however, the time trend is not entirely clear. Part-time, non-tenure track faculty were excluded from Figure 18 because there are so few of them participate in management.
 
@@ -663,22 +580,18 @@ Figure 18 suggests that adjuncts do not have an increasingly important role in m
 Another important question with regard to adjunct growth is whether this growth may be related to medical or clinical fields. It is widely known that medical fields regularly employ off-tenure track faculty to teach practical courses in nursing, medical research and medicine. The growth of adjuncts, then, may be the consequence of the staffing of medical fields.
 
 ``` r
-attach(Med_table)
-mypalette<-brewer.pal(3, "Set1")
-par(mar=c(9,5,4,2), bg="oldlace")
-plot(YEAR,AGG_EAPMED_NTT, ylab="Percent Non-tenure",xlab="Year",main="Percent Non-tenured Faculty by Medical/Non-Medical Fields", type="l", col=mypalette[1], ylim=c(40,100), lwd=2)
-points(YEAR,AGG_EAPTYP_NTT, col=mypalette[2], type="l", lwd=2)
-legend(2002,100, c('Medical Fields','Non-medical Fields'),lty=c(rep(1,2)), lwd=c(rep(2.5,2)),col=mypalette, cex=1, bg="white")
-mtext("Evans & Furstenberg",side=1,line=3,adj=0,cex=.7,col="black")
-mtext("Source: U.S. Department of Education, National Center for Education Statistics, Integrated \n Postsecondary Education Data System (IPEDS).  Survey of Employees by faculty status, primary \n function/occupational activity: 2002-2015.",side=1,line=5.5,adj=0,cex=.7,col="black")
-mtext("Note: All U.S.-based, postsecondary employees with faculty status in every field.",side=1,line=6.5,adj=0,cex=.7,col="black")
+Med_table %>%
+  gather(STATUS, PCT, 2:3) %>%
+  ggplot(aes(x=YEAR, y=PCT, group=STATUS, colour=STATUS)) +
+  geom_line() +
+  geom_line(size=1) +
+  scale_color_discrete("Institution Type", labels = c('Medical','Non-medical')) +
+  labs(title="Tenure Status of Postsecondary Faculty \n in Medical and Non-medical Schools", subtitle= "2002-2015", x="Year", y = "Percent Non-tenure Track Faculty") +
+  theme(axis.text=element_text(size=10), axis.title=element_text(size=10), legend.text=element_text(size=10), legend.title=element_text(size=10)) +
+  labs(caption = "Evans & Furstenberg. NCES IPEDS Survey of Employees by Assigned Position (EAP), primary function/occupational activity 2002-2015. \n All U.S.-based, postsecondary employees with faculty status in every field.")
 ```
 
 ![Percent Non-Tenure Track by Medical/Non-Medical Fields](graphs/PCT_NTT_by_Medical-1.png)
-
-``` r
-detach(Med_table)
-```
 
 Figure 19 shows, generally, that adjuncts have a similar presence in both medical and non-medical fields. Either way, just over 60% of faculty were non-tenure track in 2002. There may have been some minor growth of adjuncts in medical and clinical positions compared to non-medical positions, however, the growth rates are pretty comparable. The more important story is that there are comparable percentages of non-tenure track faculty in both medical and non-medical fields.
 
@@ -690,7 +603,6 @@ There are several important features for which data is unavailable in IPEDS. Spe
 Before investigating these important faculty features, however, it is worth a quick empirical comparison of non-tenure track faculty in our two longitudinal datasets. Figure 20 from SDR uses the same analytic categories as Figure 10 (IPEDS), only the SDR dataset is limited to STEM Ph.D.'s.
 
 ``` r
-#include_graphics("/Users/chadgevans/Research/Dissertation/Projects/Products/SDR_Tenure_Pct_over_Time.png")
 include_graphics(file.path(Graph, "SDR_Tenure_Pct_over_Time.png"))
 ```
 
@@ -706,7 +618,6 @@ Comparing these figures (Figure 20 and Figure 10), we see similarities. In both 
 A common belief is that the number of post-doc appointments may be growing in order to accomodate the growing numbers of doctorate recipients who are unable to find tenure-track or even full-time work. In Figure 21, we examine this concern, documenting how the proportion of Ph.D.'s working in post-doc positions has changed over the last decades.
 
 ``` r
-#include_graphics("/Users/chadgevans/Research/Dissertation/Projects/Products/SDR_PostDoc_over_Time.png")
 include_graphics(file.path(Graph, "SDR_PostDoc_over_Time.png"))
 ```
 
@@ -722,7 +633,6 @@ Among Ph.D.'s working in academia, seven percent work in non-tenure track postdo
 Another common argument is that adjunct positions, increasingly, are used as a transition to retirement. In this reasoning, full-time faculty and some individuals from the private sector accept off-tenure positions in order to gradually reduce their workload before entering permanent retirement. As SDR contains age-related information, this question can be examined using the dataset.
 
 ``` r
-#include_graphics("/Users/chadgevans/Research/Dissertation/Projects/Products/SDR_Seniors_over_Time.png")
 include_graphics(file.path(Graph, "SDR_Seniors_over_Time.png"))
 ```
 
@@ -740,7 +650,6 @@ While older faculty (65+) continue to constitute only a small minority of postse
 A final important question about the growth of adjuncts is tied to why exactly faculty work part-time in the first place. These are highly educated and trained indviduals with valuable skills in a wide range of fields. As mentioned earlier, one theory is that part-time work helps accomodate the growing number of Ph.D.'s who are unable to find full-time work. Other theories are that part-time work helps faculty transition to retirement, manage family responsibilities or hold a full-time career outside of academia. The SDR instrument specifically asked Ph.D. recipients working part-time why exactly they chose a part-time job. The following figure (Figure 23) casts light on the many reasons for doing so.
 
 ``` r
-#include_graphics("/Users/chadgevans/Research/Dissertation/Projects/Products/SDR_PT_Reasons.png")
 include_graphics(file.path(Graph, "SDR_PT_Reasons.png"))
 ```
 
@@ -752,7 +661,6 @@ Reasons for Part-time Work in Academia in 2013
 One important finding from this figure is that many adjuncts are not even interested in full-time work. There are also other, more specific, reasons for their part-time status. Nearly three in ten part-time respondents claimed their adjunct position is helping them transition to retirement (semi-retired). About one in four explained that adjunct work has helped them fulfill family responsibilities. Just over 15% claimed that they worked part-time in order to facilitate a full-time career outside of academia. Other jobs they hold may be teaching positions at other institutions or a career in the private sector. Nearly a third of part-time faculty stated that they worked part-time because a full-time job was unavailable to them. So, overall, part-time work is not typically due to an inability to find full-time work. It helps adjunct balance other goals and responsibilities.
 
 ``` r
-#include_graphics("/Users/chadgevans/Research/Dissertation/Projects/Products/SDR_PT_reasons_over_Time.png")
 include_graphics(file.path(Graph, "SDR_PT_reasons_over_Time.png"))
 ```
 
@@ -769,7 +677,6 @@ Where are the Adjuncts?
 For this question, we can return to the IPEDS data source. Non-tenure track faculty work all over the United States, but they are over-respresented in certain parts of the country. Highly urbanized areas and states on the coast tend to have higher percentages of non-tenure track faculty. This includes Virginia, North Carolina, Oregon and Florida. The midwest and southwest also are generally more dependent on adjuncts. Although not a coastal state, highly-urbanized Arizona has the highest percentage of non-tenure track faculty (82%). Rural states tend to be less dependent on contingent faculty. Only 52% of faculty work off the tenure track in Wyoming and Rhode Island. Other states with lower employment of adjuncts include North Dakota, Montana and Kentucky. An important caveat is that part-time faculty are more likely to have been double counted than full-time faculty, as some of them hold multiple jobs. Because part-timers are more likely to be non-tenure track, non-tenure track faculty may be overrepresented in this graphic. This same caveat is true for the next map.
 
 ``` r
-#include_graphics("/Users/chadgevans/Research/Dissertation/Projects/Products/US_States_Pct_NTT.png")
 include_graphics(file.path(Graph, "US_States_Pct_NTT.png"))
 ```
 
@@ -781,7 +688,6 @@ Non-tenure Track Faculty in the United States
 The employment of part-time faculty tends to follow similar patterns. Populous states and those in the southwest, midwest and New England gererally utilize higher proportions of part-time faculty. Arizona, again, has the highest percentage of part-time faculty (nearly two-thirds). Other states utilizing high percentages of part-time faculty include California, Delaware and Illinois. Rural states are less dependent on part-time labor. Only 12% of faculty work part-time in Wyoming. North Dakota, Oklahoma and Arkansas also have notably lower percentages of part-time faculty. The caveat mentioned earlier is also relevant here. Part-time faculty, more than full-time faculty, are more likely to have been double counted if they teach at multiple institutions.
 
 ``` r
-#include_graphics("/Users/chadgevans/Research/Dissertation/Projects/Products/US_States_Pct_PT.png")
 include_graphics(file.path(Graph, "US_States_Pct_PT.png"))
 ```
 
