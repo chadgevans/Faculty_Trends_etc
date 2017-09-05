@@ -2,26 +2,22 @@ Introductory Chapter
 ================
 Chad Evans
 
-Built with 3.3.2. Last run on 2017-07-16.
+Built with 3.3.2. Last run on 2017-09-05.
 
--   [Configure](#config)
+-   Configure
     -   Libraries
     -   directories
-    -   data
--   [Munge](#munge)
--   [Exploratory Analysis](#exploratory)
-    -   [Missing Data](#missing)
-    -   [Data Quality Issues](#quality)
-    -   [Faculty Features](#faculty)
-    -   [Turnover Intentions](#turnintent)
-    -   [Job Satisfaction](#satis)
--   [Exploratory Factor Analysis](#explorfac)
-    -   [Factors](#factors)
-    -   [Cronbach Alphas](#alpha)
--   [Confirmatory Factor Analysis](#confirmfac)
-    -   [Measurement Invariance](#measurementinv)
--   [Model Specification](#specify)
--   [Structural Equation Models](#sem)
+-   Munge
+-   [Introduction](#introduction)
+-   [Data](#data)
+    -   IPEDS
+    -   Survey of Doctorate Recipients
+    -   HERI Faculty Survey
+-   [The Rising Cost of Higher Education](#the-rising-cost-of-higher-education)
+    -   How are tuition dollars allocated?
+-   [The Shifting Institutional Landscape of Adjunct Work](#the-shifting-institutional-landscape-of-adjunt-work)
+-   [Reining in Postsecondary Expenses](#reining-in-postsecondary-expenses)
+-   [Where are the Adjuncts?](#where-are-the-adjuncts)
 
 Configure
 ---------
@@ -42,13 +38,13 @@ As the adjunct workforce expanded, research on this topic has broadened and inte
 
 While our understanding of non-tenure track faculty has grown considerably in the last decade, there is still much we do not know about these important academic laborers and the institutions that employ them. For one, non-tenured faculty have very different job experiences, working conditions, motivations, and disciplinary backgrounds. Yet, researchers commonly analyze contingent faculty as one homogeneous block. As a result, our body of knowledge is tailored to non-tenure track faculty in the aggregate, ignoring important subclasses with different work motivations and experiences. Researchers also commonly assume that adjuncts work exclusively in the domain of instruction. In this reasoning, postsecondary institutions hire adjuncts to temporarily fill in when their course registrations periodically fill up. We do not dispute that instruction is the principle activity of adjuncts. However, it is important to recognize that adjuncts often take on broader responsbilities in their institutions and some even work principally in administration and research, not instruction per se. Exploring the non-instruction contributions of non-tenure track faculty is something overlooked by most researchers. This study gives broad consideration to adjuncts of all work activities.
 
-Another limitation of earlier research is its overwelming focus on degree-granting, non-medical institutions. Medical institutions, it is true, use non-tenure track categories of faculty in ways different from all other departments. However, as we aim to establish the growth of adjuncts across all of postsecondary institutions, we have included medical adjuncts whenever possible. We also, important, factor in institutions that do not grant degrees. Non-degree-granting institutions consititue a large segment of postsecondary education (about 1/3 of institutions today) and they are a key pathway to facilitate access to advanced higher education. Yet, research often fails to consider the activities and growth of adjuncts in these important institutions.
+Another limitation of earlier research is its overwelming focus on degree-granting, non-medical institutions. Medical institutions, it is true, use non-tenure track categories of faculty in ways different from all other departments. However, as we aim to establish the growth of adjuncts across all of postsecondary institutions, we have included medical adjuncts whenever possible. We also, importantly, factor in institutions that do not grant degrees. Non-degree-granting institutions consititue a large segment of postsecondary education (about 1/3 of institutions today) and they are a key pathway to facilitate access to advanced higher education. Yet, research often fails to consider the activities and growth of adjuncts in these important institutions.
 
-This paper principally investigates the growth of adjuncts in higher education, but it also does much more. As the employment of adjunct faculty is viewed largely as a cost-savings strategy, we examine the latest financial data to gain an understanding of how postsecondary institutions allocate resources and how these expenses have shifted over time. Next, we examine the institutional context of higher education, exploring how postsecondary institutions have evolved over the last decades. It is well-known that 2-year and community colleges have grown over the last decades (and we document these trends), but other instiutional characteristics have shifted as well and these merit further investigation. Thirdly, along various institutional and labor dimensions, we examine how the proportion of non-tenure track faculty has changed over time. In other words, we examine how the proportion of adjuncts has grown over time in different ways. In the final section of this report, we examine important typologies for conceptualizing and analyzing non-tenure track faculty, their demographic characteristics and work conditions.
+This paper principally investigates the growth of adjuncts in higher education, but it also does much more. As the employment of adjunct faculty is viewed largely as a cost-savings strategy, we examine the latest financial data to gain an understanding of how postsecondary institutions allocate resources and how these expenses have shifted over time. Next, we examine the institutional context of higher education, exploring how postsecondary institutions have evolved over the last decades. It is well-known that 2-year and community colleges have grown over the last decades (and we document these trends), but other instiutional characteristics have shifted as well and these merit further investigation. Thirdly, along various institutional and labor dimensions, we examine how the proportion of non-tenure track faculty has changed over time. In other words, we examine how the proportion of adjuncts has grown over time in different ways.
 
 ### Research Questions
 
-In short, our main research questions center around the following themes: 1. How are expenses in higher education distributed and how has that changed over time? 2. How has the institutional landscape (and institutional characteristics) shifted over the last decades? 3. In which kinds of institutions has the growth in the proportion of non-tenure track faculty been most prominent? 4. Who are the Non-Tenure Track Faculty, where are they, and what is the nature of their work conditions?
+In short, our main research questions center around the following themes: 1) How are expenses in higher education distributed and how has that changed over time? 2) How has the institutional landscape (and institutional characteristics) shifted over the last decades? 3) In which kinds of institutions has the growth in the proportion of non-tenure track faculty been most prominent?
 
 Data
 ----
@@ -89,10 +85,10 @@ IPEDS is the best data source for institutional-level data. It contains informat
 Variables
 ---------
 
-This study examines a range of institutional characteristics and the roles adjuncts fulfill in these places. We examine how the instiutional landscape has shifted over time based on institutional level (less-than\_2-year, 2-year, 4-year), control (public, private, for-profit), degree-granting status, carnegie classification by research intensity, selectivity and presence of a tenure system. We also examine the growth of adjuncts in these institution types, as well as their growth in administrative/managerial positions, clinical (medical) positions, and postdoc jobs. Finally, we examine the reasons faculty work part-time in academia (e.g., family responsibilities, retirement transition, etc.). Whenever possible, we defined these terms in accordance with the Department of Education and the National Center for Educational Statistics (NCES). Our work also draws on adjunct typologies based on the work of Gappa and Leslie (1993) and Furstenberg (2016). For a glossary of our definitions, please see the appendix.
+This study examines a range of institutional characteristics and the roles adjuncts fulfill in these places. We examine how the instiutional landscape has shifted over time based on institutional level (less-than\_2-year, 2-year, 4-year), control (public, private, for-profit), degree-granting status, carnegie classification by research intensity, selectivity and presence of a tenure system. We also examine the growth of adjuncts in these institution types, as well as their growth in administrative/managerial positions, clinical (medical) positions, and postdoc jobs. Finally, we examine the reasons faculty work part-time in academia (e.g., family responsibilities, retirement transition, etc.). Whenever possible, we defined these terms in accordance with the Department of Education and the National Center for Educational Statistics (NCES). Our work also draws on adjunct typologies based on the work of Gappa and Leslie (1993). For a glossary of our definitions, please see the appendix.
 
-The Rising Cost of Higher Education.
-====================================
+The Rising Cost of Higher Education
+===================================
 
 To understand the rising costs of higher education, it is important to recognize fundamental demographic changes in the United States and the increasing portion of the population now attending institutions of higher learning. In the late 1950s, there were 2.5 million students enrolled in colleges and universities full-time and 1.25 million part-time students. These figures grew rapidly since they were first collected. Today, there are around 13 million full-time students and 8 million part-time students. These figures are expected to reach 14.4 and 8.8 million, respectively, by 2024. The growth over time has been approximately linear with subtle troughs and peaks corresponding to demographic expansions (e.g. baby-boomers, millennial expansion) in the broader American population.
 
@@ -110,7 +106,7 @@ EnrollTab %>%
 
 ![Increases in Student Enrollment](graphs/Student_Enrollment-1.png)
 
-Historically, higher education has been very dependent on government support and public financial support has increased yearly for decades. However, while the government's absolute subsidization of higher education has increased over time, it has not kept up with the expansion in the student population. As a result, the per-pupil rate of government support has slowly declined. This has forced institutions to pursue cost-saving measures and alternative sources of revenue. In large part, the public has shifted the financial burden of higher education from taxpayers onto the students themselvee. This is evident from the conistent increase in tuition over the last decades.
+Historically, higher education has been very dependent on government support and public financial support has increased yearly for decades. However, while the government's absolute subsidization of higher education has increased over time, it has not kept up with the expansion in the student population. As a result, the per-pupil rate of government support has slowly declined. This has forced institutions to pursue cost-saving measures and alternative sources of revenue. In large part, the public has shifted the financial burden of higher education from taxpayers onto the students themselves. This is evident from the conistent increase in tuition over the last decades.
 
 ``` r
 tuition_table<-tuition_table[!(tuition_table$CONTROL=="All" | tuition_table$CONTROL=="Private"),] 
@@ -140,7 +136,7 @@ How are tuition dollars allocated?
 
 Postsecondary expenses have risen rapidly over the last decades. In 1987, American institutions spent 100 billion on higher education. In 2014, they spent nearly half a trillion dollars ($488 billion). At all time points, the biggest expense has been on instruction (including salary and benefits). $156 billion was spent on instruction in 2014 or about one-third of the entire budget. Other important higher education expenses go towards instructional support, hospital services, and research. The following figure depicts the expansion and distribution of expenses over the last decades.
 
-While expenses have grown considerably, how those expenses are distributed remains proportional from year to year. As an example, across all years, the minimum budget share spent on instruction was 29.7% in 1994. The most, as a percentage of the budget, spent on instruction was in 1997 (31.4%). Similarly, expenses on the salaries and wages of institutional executives and administrators (of portion of institutional supports) was around 4.5-5% in all time periods, with little variation.
+While expenses have grown considerably, how those expenses are distributed remains proportional from year to year. As an example, across all years, the minimum budget share spent on instruction was 29.7% in 1994. The most, as a percentage of the budget, spent on instruction was in 1997 was 31.4%. Similarly, expenses on the salaries and wages of institutional executives and administrators (of portion of institutional supports) was around 4.5-5% in all time periods, with little variation.
 
 ``` r
 Delta_table %>% 
@@ -159,50 +155,51 @@ Delta_table %>%
 ``` r
 table<-Delta_table %>%
   select(-academicyear) %>%
-  mutate(Total=rowSums(., na.rm=T), PCT_INSTRUCT=100*instruction01/Total, YEAR=1987:2013)
-table<-table[,c(13,2:12)]
+  mutate(Total=rowSums(., na.rm=T), PCT_INSTRUCT=100*instruction01/Total, Year=1987:2013) %>%
+  `colnames<-`(c("Academic Support","Auxiliary Enterprises","Hospitals","Independent Operations","Instructional Support","Instruction","Public Service","Research","Student Services","Net Aid/Other","Total Expenses","Total Pct. on Teaching","Year"))
+table<-table[,c(13,1:12)]
 kable(table)
 ```
 
-|  YEAR|  auxiliary01|  hospital01|  independ01|  instsupp01|  instruction01|  pubserv01|  research01|  studserv01|  NetAid\_Other|  Total|  PCT\_INSTRUCT|
-|-----:|------------:|-----------:|-----------:|-----------:|--------------:|----------:|-----------:|-----------:|--------------:|------:|--------------:|
-|  1987|         11.3|        9.34|        2.94|        10.2|           33.9|       3.48|        9.39|        5.01|           15.3|    108|           31.3|
-|  1988|         11.7|       10.79|        2.84|        10.8|           36.0|       3.83|       10.39|        5.43|           16.3|    116|           31.0|
-|  1989|         12.7|       12.17|        2.98|        11.6|           38.9|       4.22|       11.39|        5.76|           17.9|    126|           30.8|
-|  1990|         13.5|       13.03|        3.20|        12.7|           42.3|       4.74|       12.55|        6.42|           19.7|    138|           30.7|
-|  1991|         14.6|       14.78|        3.37|        13.8|           45.6|       5.12|       13.49|        7.05|           21.4|    149|           30.6|
-|  1992|         15.4|       16.61|        3.57|        14.6|           48.2|       5.54|       14.31|        7.55|           23.9|    160|           30.1|
-|  1993|         16.0|       17.74|        3.67|        15.4|           50.5|       5.98|       15.35|        8.20|           25.9|    170|           29.7|
-|  1994|         16.9|       18.50|        3.39|        16.0|           53.0|       6.29|       16.19|        8.60|           27.5|    178|           29.7|
-|  1995|         17.7|       18.67|        3.54|        17.0|           55.9|       6.74|       17.18|        9.08|           28.9|    187|           29.9|
-|  1996|         18.0|       17.90|        1.82|        18.4|           57.7|       6.93|       17.65|        9.51|           31.0|    193|           30.0|
-|  1997|         19.2|       16.74|        1.26|        18.8|           59.4|       7.31|       18.89|       10.08|           23.4|    189|           31.4|
-|  1998|         20.5|       20.50|        2.11|        21.0|           64.0|       7.71|       20.21|       11.21|           24.2|    207|           30.9|
-|  1999|         21.7|       21.62|        3.28|        22.8|           68.0|       8.29|       21.69|       12.19|           25.7|    222|           30.6|
-|  2000|         23.1|       24.18|        3.32|        23.8|           74.5|       8.88|       23.96|       13.68|           35.7|    249|           29.9|
-|  2001|         25.9|       24.28|        4.10|        26.5|           81.1|       9.84|       26.80|       14.91|           35.5|    269|           30.1|
-|  2002|         23.7|       24.57|        3.90|        27.1|           84.1|      10.13|       28.10|       15.93|           43.7|    281|           29.9|
-|  2003|         25.0|       25.90|        4.49|        28.7|           89.6|      10.48|       30.72|       16.94|           45.2|    298|           30.1|
-|  2004|         26.1|       26.58|        4.98|        30.2|           93.0|      10.90|       32.82|       18.07|           41.8|    306|           30.4|
-|  2005|         27.4|       29.22|        4.88|        31.5|           98.1|      11.50|       34.82|       19.48|           42.5|    322|           30.4|
-|  2006|         28.8|       30.27|        4.95|        33.4|          103.8|      11.71|       35.66|       21.11|           46.6|    341|           30.4|
-|  2007|         30.8|       32.45|        5.52|        35.9|          111.3|      12.21|       36.90|       22.80|           45.8|    360|           30.9|
-|  2008|         33.6|       35.04|        5.84|        39.7|          119.2|      13.11|       39.36|       24.68|           52.3|    392|           30.4|
-|  2009|         35.2|       38.28|        6.36|        41.7|          125.0|      13.73|       41.53|       26.49|           54.5|    413|           30.2|
-|  2010|         38.3|       41.28|        6.45|        42.3|          131.5|      14.17|       45.09|       28.25|           54.8|    434|           30.3|
-|  2011|         40.3|       43.71|        6.59|        44.2|          137.8|      14.72|       47.70|       29.92|           58.7|    457|           30.2|
-|  2012|         41.4|       48.10|        6.72|        45.4|          142.1|      14.91|       48.16|       31.56|           60.2|    474|           30.0|
-|  2013|         42.2|       50.42|        6.73|        47.2|          145.7|      14.85|       48.36|       32.45|           59.1|    484|           30.1|
+|  Year|  Academic Support|  Auxiliary Enterprises|  Hospitals|  Independent Operations|  Instructional Support|  Instruction|  Public Service|  Research|  Student Services|  Net Aid/Other|  Total Expenses|  Total Pct. on Teaching|
+|-----:|-----------------:|----------------------:|----------:|-----------------------:|----------------------:|------------:|---------------:|---------:|-----------------:|--------------:|---------------:|-----------------------:|
+|  1987|              7.63|                   11.3|       9.34|                    2.94|                   10.2|         33.9|            3.48|      9.39|              5.01|           15.3|             108|                    31.3|
+|  1988|              8.21|                   11.7|      10.79|                    2.84|                   10.8|         36.0|            3.83|     10.39|              5.43|           16.3|             116|                    31.0|
+|  1989|              8.93|                   12.7|      12.17|                    2.98|                   11.6|         38.9|            4.22|     11.39|              5.76|           17.9|             126|                    30.8|
+|  1990|              9.49|                   13.5|      13.03|                    3.20|                   12.7|         42.3|            4.74|     12.55|              6.42|           19.7|             138|                    30.7|
+|  1991|             10.08|                   14.6|      14.78|                    3.37|                   13.8|         45.6|            5.12|     13.49|              7.05|           21.4|             149|                    30.6|
+|  1992|             10.63|                   15.4|      16.61|                    3.57|                   14.6|         48.2|            5.54|     14.31|              7.55|           23.9|             160|                    30.1|
+|  1993|             11.15|                   16.0|      17.74|                    3.67|                   15.4|         50.5|            5.98|     15.35|              8.20|           25.9|             170|                    29.7|
+|  1994|             11.76|                   16.9|      18.50|                    3.39|                   16.0|         53.0|            6.29|     16.19|              8.60|           27.5|             178|                    29.7|
+|  1995|             12.34|                   17.7|      18.67|                    3.54|                   17.0|         55.9|            6.74|     17.18|              9.08|           28.9|             187|                    29.9|
+|  1996|             13.66|                   18.0|      17.90|                    1.82|                   18.4|         57.7|            6.93|     17.65|              9.51|           31.0|             193|                    30.0|
+|  1997|             13.94|                   19.2|      16.74|                    1.26|                   18.8|         59.4|            7.31|     18.89|             10.08|           23.4|             189|                    31.4|
+|  1998|             15.52|                   20.5|      20.50|                    2.11|                   21.0|         64.0|            7.71|     20.21|             11.21|           24.2|             207|                    30.9|
+|  1999|             17.12|                   21.7|      21.62|                    3.28|                   22.8|         68.0|            8.29|     21.69|             12.19|           25.7|             222|                    30.6|
+|  2000|             18.14|                   23.1|      24.18|                    3.32|                   23.8|         74.5|            8.88|     23.96|             13.68|           35.7|             249|                    29.9|
+|  2001|             20.19|                   25.9|      24.28|                    4.10|                   26.5|         81.1|            9.84|     26.80|             14.91|           35.5|             269|                    30.1|
+|  2002|             20.03|                   23.7|      24.57|                    3.90|                   27.1|         84.1|           10.13|     28.10|             15.93|           43.7|             281|                    29.9|
+|  2003|             20.65|                   25.0|      25.90|                    4.49|                   28.7|         89.6|           10.48|     30.72|             16.94|           45.2|             298|                    30.1|
+|  2004|             21.90|                   26.1|      26.58|                    4.98|                   30.2|         93.0|           10.90|     32.82|             18.07|           41.8|             306|                    30.4|
+|  2005|             23.00|                   27.4|      29.22|                    4.88|                   31.5|         98.1|           11.50|     34.82|             19.48|           42.5|             322|                    30.4|
+|  2006|             24.80|                   28.8|      30.27|                    4.95|                   33.4|        103.8|           11.71|     35.66|             21.11|           46.6|             341|                    30.4|
+|  2007|             26.37|                   30.8|      32.45|                    5.52|                   35.9|        111.3|           12.21|     36.90|             22.80|           45.8|             360|                    30.9|
+|  2008|             29.13|                   33.6|      35.04|                    5.84|                   39.7|        119.2|           13.11|     39.36|             24.68|           52.3|             392|                    30.4|
+|  2009|             30.73|                   35.2|      38.28|                    6.36|                   41.7|        125.0|           13.73|     41.53|             26.49|           54.5|             413|                    30.2|
+|  2010|             32.17|                   38.3|      41.28|                    6.45|                   42.3|        131.5|           14.17|     45.09|             28.25|           54.8|             434|                    30.3|
+|  2011|             33.28|                   40.3|      43.71|                    6.59|                   44.2|        137.8|           14.72|     47.70|             29.92|           58.7|             457|                    30.2|
+|  2012|             34.91|                   41.4|      48.10|                    6.72|                   45.4|        142.1|           14.91|     48.16|             31.56|           60.2|             474|                    30.0|
+|  2013|             36.55|                   42.2|      50.42|                    6.73|                   47.2|        145.7|           14.85|     48.36|             32.45|           59.1|             484|                    30.1|
 
-    ## # A tibble: 1 x 1
-    ##    YEAR
-    ##   <int>
-    ## 1  1994
+    ## Warning: Unknown or uninitialised column: 'PCT_INSTRUCT'.
 
-    ## # A tibble: 1 x 1
-    ##    YEAR
-    ##   <int>
-    ## 1  1997
+    ## # A tibble: 0 x 1
+    ## # ... with 1 variables: Year <int>
+
+    ## Warning: Unknown or uninitialised column: 'PCT_INSTRUCT'.
+
+    ## # A tibble: 0 x 1
+    ## # ... with 1 variables: Year <int>
 
 ``` r
 expensedata %>% 
@@ -223,7 +220,8 @@ expensedata[-1] <-expensedata[-1] %>%
   as.matrix() %>% 
   prop.table(margin = 2) %>%
   `*`(100) %>%
-  round(1)
+  round(1) #%>%
+#  `colnames<-`(c("Expense Type","Public Institutions","Private Institutions","All Institutions"))
 kable(expensedata, caption = "Distribution of budget expenses in Public and Private colleges and universities in 2014")
 ```
 
@@ -264,10 +262,6 @@ Inst_Level_table %>%
   labs(caption = "Evans & Furstenberg. NCES IPEDS Survey of Institutional Characteristics 1989-2015.")
 ```
 
-    ## Warning: Removed 3 rows containing missing values (geom_path).
-
-    ## Warning: Removed 3 rows containing missing values (geom_path).
-
 ![Growth of Postsecondary Institutions by Level](graphs/Inst_Growth_by_Level_over_Time-1.png)
 
 As seen in Figure 5, the United States has added new postsecondary institutions throughout the entire timespan of this graph. Of all levels, the four-year sector has added the greatest number of institutions. There were only 1670 in 1980 and in 2015 there were 3161--a 90% increase. Two-year institutions have experienced similar rates of growth, going from 1018 in 1980 to 2195 in 2015 (115% growth). There is less information available on less-than-two-year institutions, but we know that their rate of growth has increased rapidly since the turn of the century. Since 2010 alone, the number of less-than-2-year schools has increased by 30%. Today, 40% of institutions are four-year and the remaining 60% of institutions are evenly split between two-year and less-than-two-year institutions.
@@ -287,10 +281,6 @@ Inst_Control_table %>%
   theme(axis.text=element_text(size=10), axis.title=element_text(size=10), legend.text=element_text(size=10), legend.title=element_text(size=10)) +
   labs(caption = "Evans & Furstenberg. NCES IPEDS Survey of Institutional Characteristics 1980-2015.")
 ```
-
-    ## Warning: Removed 8 rows containing missing values (geom_path).
-
-    ## Warning: Removed 8 rows containing missing values (geom_path).
 
 ![Institutional Growth by Control Over Time](graphs/Inst_Growth_by_Control_over_Time-1.png)
 
@@ -696,172 +686,6 @@ include_graphics(file.path(Graph, "US_States_Pct_PT.png"))
 Part-time Faculty in the United States
 </p>
 
-Adjunct Typologies
-==================
-
-As demonstrated earlier, non-tenure track faculty are heterogeneous in their composition. Some are young academics trying to begin their careers in academia. Some are retiring faculty who are interested in leaving their life's work in a gradual fashion. We explored the motives for working part-time in academia and indeed it was a useful way to characterize and classify non-tenure track faculty. We also explored two other classification schema in our research. The first was designed by Gappa and Leslie and featured in their 1993 book "The Invisible Faculty." Gappa and Leslie were some of the earlist scholars to identify and seek knowledge about the growing numbers of part-time faculty in higher education. Examining faculty at 18 colleges and universities, they focused on the features of career-enders; experts; freelancers; and aspiring academics. Career enders consisted of faculty who were in the process of retiring from the workforce. Many of these individuals were not career academics, but instead had worked in the private sector. Part-time faculty in this class worked for supplemental income or simply because they enjoyed teaching. Experts (specialists or professionals) were hired for their specialized knowledge or experience. Freelancers were mostly faculty who wanted to supplement the income earned from a career outside of academia. These faculty were also commonly homemakers, taking care of children and domestic chores on the side.
-
-A final category identified by these authors were the aspiring academics. Aspiring academics are “relatively new Ph.D.’s seeking tenure-track appointments and some Ph.D. recipients who have been teaching on a part-time basis for years in the hope of attaining a full-time, tenure-track position. Under better circumstances, they would be part of the tenured faculty (1993, p.54.55).” This definition calls attention to an important dimension often excluded by many researchers. Rather than generalize across all adjuncts, Gappa and Leslie make the point of distinguishing between those who are trying to establish a full-time, long-term career in academia and those who simply dabble in it. Recognizing the voluntary/involuntary nature of contingent status, then, is integral for any typological schema. This is a point also stressed by other researchers (Tilly 1998, Maynard and Joseph 2008).
-
-While the IPEDS and SDR datasets were very useful in understanding the growth of non-tenure track faculty over the decades, they each possess limitations. For the follow section, we draw on the HERI Faculty Survey. HERI is a cross-sectional instrument generalizing to all postsecondary instructional faculty. We draw specifically on their component related to non-tenure track faculty. The information on these faculty, particularly the part-time, non-tenure track faculty, is far more detailed than IPEDS or SDR. In the following figure (Figure 27), we take advantage of this detail by reproducing the classifcation schema formalized by Leslie and Gappa (1993).
-
-``` r
-mypalette<-brewer.pal(5, "Set1")
-par(mar=c(9,5,4,2), bg="oldlace")
-load(file.path(Private_Cache,"Cleaned_HERI.RData"))
-barplot2<-barplot(100*(prop.table(table(df$GAPPANTT))), ylab="Percent", main="Gappa and Leslie (1993) Classification of NTT Faculty", col=mypalette, axes=FALSE, axisnames=FALSE)
-labels<-c("Full-time \n Adjuncts","Aspriring \n Academics","Career- \n Enders","Experts","Freelancers")
-text(barplot2, par('usr')[3], labels = labels, srt = 45, adj = c(1.1,1.1), xpd = TRUE, cex=1)
-axis(2)
-mtext("Evans & Furstenberg",side=1,line=5,adj=0,cex=.7,col="black")
-mtext("Source: Higher Education Research Institute (HERI) Faculty Survey, 2013.",side=1,line=6,adj=0,cex=.7,col="black")
-```
-
-![Gappa and Leslie (1993) Classification](graphs/Gappa_Leslie_Classification-1.png)
-
-As shown above, half of the data we were supplied by HERI pertain to full-time, non-tenure track faculty. Aspiring academics are the largest subgroup of part-time faculty. In fact, there are more part-time aspiring academics in the sample than all other part-time adjuncts put together. Experts and freelancers each constitute about 10% of the non-tenure track population. Career-enders constitute a small minority of 4%.
-
-Dr. Furstenberg developed a second classification system that splits adjuncts into four categories, rather than five. In his framework, adjunct classification takes on two dimensions: whether the faculty member worked full-time or part-time, and whether the adjunct held work in addition to his or her adjunct position. Professional adjuncts were part-time faculty who held full-time careers outside of education. Itinerants were faculty members teaching piecemeal at two or more institutions. Some have referred to these individuals as "freedom flyers" as they tend to spend a considerable amount of time commuting between jobs. Single institution adjuncts, however, only hold one part-time position and no other career (inside or outside of academia). They are therefore employed by a single institution. His last category is the full-time, non-tenure track group of faculty members. When applying Furstenberg's schema, it divides the sample of part-time faculty members into equitably sized groups, each containing between 13% and 19% of the sample.
-
-``` r
-mypalette<-brewer.pal(4, "Set2")
-par(mar=c(9,5,4,2), bg="oldlace")
-barplot3<-barplot(100*(prop.table(table(df$ADJUNCT1))), ylab="Percent", main="Furstenberg (2016) Classification of NTT Faculty", col=mypalette, axes=FALSE, axisnames=FALSE)
-labels<-c("Professional \n Adjuncts","Itinerant \n Academics","Single Inst. \n Adjuncts","Full-time \n Adjuncts")
-text(barplot3, par('usr')[3], labels = labels, srt = 45, adj = c(1.1,1.1), xpd = TRUE, cex=1)
-axis(2)
-mtext("Evans & Furstenberg",side=1,line=5,adj=0,cex=.7,col="black")
-mtext("Source: Higher Education Research Institute (HERI) Faculty Survey, 2013.",side=1,line=6,adj=0,cex=.7,col="black")
-```
-
-![Furstenberg (2016) Classification](graphs/Furstenberg_Classification-1.png)
-
-Who are the Adjuncts?
-=====================
-
-Now we turn our attention to how adjunct classification compares across demographics, employment conditions and job activities. We rely on the Gappa and Leslie categorization here due to its prevalence in the literature. HERI allowed us to distinguish all five categories of adjuncts, derived from questions related to full-time/part-time status, (in)voluntary status, outside career status and whether retirement is imminent (with three years).
-
-Demographic Characteristics
----------------------------
-
-``` r
-options(digits=2)
-DemVars<-df[,c("SEX","MINORITY","MARRIED","PARENT","DEGEARN","AGEC")]
-list<-do.call(rbind, sapply(DemVars, function(x){prop.table(table(x, df$GAPPANTT),2)}))
-kable(list, caption = "Distribution of Adjunct Types by Demographic Characteristics")
-```
-
-|              |  FT NTT|  Aspiring Academic|  Career-Ender|  Expert|  Freelancer|
-|--------------|-------:|------------------:|-------------:|-------:|-----------:|
-| Male         |    0.44|               0.48|          0.56|    0.60|        0.38|
-| Female       |    0.56|               0.52|          0.44|    0.40|        0.62|
-| White        |    0.84|               0.89|          0.80|    0.78|        0.79|
-| Non-white    |    0.16|               0.11|          0.20|    0.22|        0.21|
-| Married      |    0.77|               0.83|          0.79|    0.76|        0.74|
-| Unmarried    |    0.23|               0.17|          0.21|    0.24|        0.26|
-| Non-Parent   |    0.33|               0.21|          0.17|    0.26|        0.37|
-| Parent       |    0.67|               0.79|          0.83|    0.74|        0.63|
-| Ph.D.        |    0.37|               0.24|          0.29|    0.14|        0.27|
-| Professional |    0.09|               0.11|          0.14|    0.12|        0.07|
-| Masters      |    0.49|               0.54|          0.48|    0.64|        0.59|
-| BA or Less   |    0.05|               0.11|          0.09|    0.10|        0.07|
-| Under 40     |    0.25|               0.14|          0.02|    0.21|        0.32|
-| 40 to 55     |    0.39|               0.28|          0.04|    0.44|        0.39|
-| 55+          |    0.36|               0.58|          0.94|    0.35|        0.29|
-
-In terms of demographic characteristics, full-time non-tenure track faculty tend to be married with children. Three-quarters are married and two-thirds of them have at least one child. They come from various segments of the age distribution, with sizeable numbers (39%) mid-career (age 40-55) and are evenly split between men and women. Half tend to have earned a Ph.D. and half are at the Master's level. There are also a few (5%) who have only earned a bachelor's (or lower).
-
-Aspiring academics tend to closely resemble full-time, non-tenure track faculty. The only difference is that aspiring academics have been unable to obtain a full-time position in academia. Aspiring academics also are slightly less likely to have earned a Ph.D., which is probably closely related to why they have been unable to find full-time work in a single institution.
-
-Career-enders are predictably older, with 96% of them 55 or older. They are overwelmingly white, which is an artifact of the time period when many of them were hired. However, the gender composition is evenly split. They also are more likely to have children, which again is related to the fact that they are older and have had more time to begin families. Aside from these features, career-enders are otherwise very similar to full-time adjuncts and aspiring academics.
-
-Experts in academia tend to be white men (60% are men). They also tend to be older and are less likely to have earned a Ph.D.. Many of these characteristics make sense for an expert. They are older, having spent many years outside of academia gaining practical experience valuable to students. They are hired for this expertise, not for their educational credentials, per se.
-
-Finally, freelancers are very similar to experts on most demographic characteristics. The one important exception is related to gender. Freelancers are much more likely to be female. Perhaps women pursue freelancing academic careers in order to be more available to their families. However, our analysis finds that freelancers are no more likely to have children than experts. Nonetheless, traditional gender roles likely have a role in determining why women become freelancers and men become adjunct experts.
-
-Employment conditions of Non-tenure track Faculty
--------------------------------------------------
-
-``` r
-options(digits=2)
-levels(df$GENACT01) <- c("Non-Union", "Union") #Act: Are you a member of a faculty union?
-EmployVars<-df[,c("HPW10Q","HPW13Q","HEALTHBENEFITS", "RETIREBENEFITS","GENACT01","SALARY","INCOME")]
-list<-do.call(rbind, sapply(EmployVars, function(x){if(class(x)=="factor"){
-  prop.table(table(x, df$GAPPANTT),2)
-} else{
-as.numeric(t(aggregate(x, by=list(df$GAPPANTT), data=df, FUN=mean, na.rm=TRUE))[2,])}
-}))
-rownames(list)[c(1:2,9,10)]<-c("Hrs Outside Consulting","Hrs Outside Employment", "Inst. Salary","Income")
-kable(list, caption = "Employment Conditions of Adjunct Types")
-```
-
-|                        |    FT NTT|  Aspiring Academic|  Career-Ender|     Expert|  Freelancer|
-|------------------------|---------:|------------------:|-------------:|----------:|-----------:|
-| Hrs Outside Consulting |      1.40|               2.90|          2.30|       4.50|        2.70|
-| Hrs Outside Employment |      1.70|              13.70|          5.50|      28.70|        6.00|
-| Health Ins             |      0.95|               0.44|          0.57|       0.39|        0.63|
-| No Health Ins          |      0.05|               0.56|          0.43|       0.61|        0.37|
-| Retirement             |      0.94|               0.49|          0.61|       0.43|        0.64|
-| No Retirement          |      0.06|               0.51|          0.39|       0.57|        0.36|
-| Non-Union              |      0.87|               0.81|          0.71|       0.85|        0.73|
-| Union                  |      0.13|               0.19|          0.29|       0.15|        0.27|
-| Inst. Salary           |  59289.00|           16023.00|      21191.00|   11426.00|    17987.00|
-| Income                 |  75559.00|           94772.00|      69975.00|  103302.00|    51185.00|
-
-In terms of employment conditions, different types of adjunct face different types of conditions. As one would expect, full-time, non-tenure track faculty tend to have little or no work outside of their principle job. This makes sense, as they are already dedicating 35 hours or more to their principle job. As they are full-time workers, they also tend to have much stronger institutional support in terms of salary and perquisites. They earn good salaries (60,000/yr) and the vast majority have health insurance and retirement contributions. Perhaps because of this support, few of them have organized as members of labor unions.
-
-Nearly half of aspriring academics have some or a lot of work outside of their principle academic position. Many of these aspiring academics, no doubt, are the itinerants or freeway fliers trying to piece together a career and work towards a full-time position. Half of them receive retirment benefits and half have employer contributions to their healthcare. Only a quarter have union membership. Their institutional salary is low ($16,000), which is probably why so many of them have second or even third jobs. Their family income is more robust ($70,000), suggesting that these individuals may have spouses taking on considerable responsibilities for family finances.
-
-Career-enders tend to have similar job conditions as aspiring academics, only they are less likely to have jobs outside of their academic appointment. Their salary also tends to be higher, perhaps because they are older, have more job connections and more experience. They are also more likely to have health and retirement benefits. Maintaining health and retirement benefits is probably an important part of why career-enders like to stay active in academia before completely retiring. In all other ways, their work conditions seem closely related to what aspiring academics expereince.
-
-Three-quarters of experts work substantial hours outside of their academic appointment. They are also less likely to have healthcare contributions, retirement benefits and union representation. Perhaps many of them already have health and retirement benefits from outside careers. Their institutional salary is also pretty low, but their overall income is by far the highest of all adjunct types. This all conforms with our expectations regarding experts. These individuals do not participate in academia for financial reasons. They probably do it simply because they like sharing their work experience with young people, being exposed to a stimulating, intellectual environment or they need a productive break from their full-time careers.
-
-Finally, Freelancers are nearly identical to aspiring academics, except that they are much less likely to have substantial work outside of their principle academic appointment. Freelancers teach part-time proabably because they enjoy teaching, but do not necessarily want to do it full-time. A part-time job probably gives them great flexibility to meet family demands or other responsibilities.
-
-Number of courses taught and instructional support
---------------------------------------------------
-
-``` r
-options(digits=2)
-InstructVars<-df[,c("PRINACT","BIGLAN","PROFDEVOPP","PROFDEVPART","COURSENUM","CRSENROLL01")]
-list<-do.call(rbind, sapply(InstructVars, function(x){if(class(x)=="factor"){
-  prop.table(table(x, df$GAPPANTT),2)
-} else{
-as.numeric(t(aggregate(x, by=list(df$GAPPANTT), data=df, FUN=mean, na.rm=TRUE))[2,])}
-}))
-rownames(list)[15:16]<-c("No. of Courses","No. of Students")
-kable(list, caption = "Work Conditions and Support of Adjunct Types")
-```
-
-|                                  |  FT NTT|  Aspiring Academic|  Career-Ender|  Expert|  Freelancer|
-|----------------------------------|-------:|------------------:|-------------:|-------:|-----------:|
-| Teaching                         |    0.80|               0.95|          0.95|    0.98|        0.96|
-| Administration                   |    0.11|               0.01|          0.02|    0.01|        0.01|
-| Research                         |    0.04|               0.01|          0.02|    0.01|        0.01|
-| Services to clients and patients |    0.03|               0.01|          0.00|    0.00|        0.01|
-| Other                            |    0.02|               0.02|          0.02|    0.01|        0.01|
-| Hard/Applied                     |    0.35|               0.36|          0.28|    0.47|        0.22|
-| Hard/Pure                        |    0.04|               0.03|          0.05|    0.01|        0.03|
-| Soft/Applied                     |    0.19|               0.20|          0.25|    0.17|        0.17|
-| Soft/Pure                        |    0.33|               0.34|          0.37|    0.29|        0.51|
-| Other                            |    0.09|               0.07|          0.06|    0.06|        0.07|
-| Prof. Dev. Available             |    0.97|               0.85|          0.86|    0.76|        0.81|
-| No Professional Development      |    0.03|               0.15|          0.14|    0.24|        0.19|
-| Prof. Dev. Participant           |    0.75|               0.39|          0.50|    0.26|        0.39|
-| Not a Prof. Dev. Participant     |    0.25|               0.61|          0.50|    0.74|        0.61|
-| No. of Courses                   |    2.80|               1.80|          2.40|    1.90|        3.00|
-| No. of Students                  |   36.00|              26.00|         27.00|   24.00|       29.00|
-
-There are also differences in the actual work activities of adjuncts. While all adjuncts in the HERI sample are instructors in some capacity, full-time adjuncts are more likely than the other classes of adjuncts to have principle job responsibilities in other areas like administration and research. Full-time adjuncts are hired in all academic fields (Biglan classification), however, they are less likely to be found in the hard/pure sciences. They do work regularly in the hard/applied fields, however, like medicine and nursing. Nearly all full-time adjuncts have professional development opportunities available to them and, furthermore, the majority partipate in professional development on a regular basis. This behavior ties in to what we know about full-time employees. Employers make a greater effort to develop the staff they see as full-time and fully committed. Full-time adjuncts tend to have considerable teaching obligations. They teach nearly three courses on average and also tend to have larger classes than other adjunct types.
-
-Regarding aspiring adjuncts, their principle activity in the vast majority of cases is teaching. Aspiring academics are found in all Biglan academic fields (although rarely in hard/pure sciences). Professional development is less likely part of an aspiring academic's work experiences. Many (20%) do not have opportunities for professional development and only a third ever participate in workplace trainings. Their teaching load resembles that of full-time adjuncts, despite the fact that they only work part-time. This high teaching load, no doubt, is part of the reason aspiring academics have difficulty securing full-time work. They teach almost as much as their full-time, non-tenure track collegues, often hold outside careers, and must prepare applications and interview for work. This is a sizeable amount of responsibly for someone only working part-time in academia.
-
-Career-enders also tend to be teachers, although some have principle responsibilities in administration. Professional development opportunities tend to be available for career-enders and a small majority of this group of adjuncts actually takes part in training opportunities. Among part-time adjunct types, career-enders are the most likely to participate in professional development, perhaps because they are accomstomed to these kinds of trainings from the earlier part of their careers. Career-enders teach fewer classes on average (1.8 classes).
-
-Similar to aspiring academics, the principle job activity of experts is to teach. Their teaching, however, tends to mainly be in the hard/applied sciences. So clinical faculty and those working in medicine are often adjunct experts. Professional development is widely available for experts, but they are less likely to actually participate in these trainings. This may be related to the fact that they are "experts" and additional training may not be useful or valuable to them. Experts teach 1.5 classes on average, with slightly smaller class sizes. This may be related to the applied nature of some of the courses they teach. There may be more hands-on activities requiring smaller class sizes for these adjuncts.
-
-Freelancers resemble aspiring academics with regared to work activities, without quite as demanding of circumstances. The majority of them have principle teaching activities and they teach in the same fields as aspriring adjuncts. Professional development is generally avaialble and many are participants in these trainings. At 2.2 courses, their workload is slightly lighter than that of aspiring academics.
-
 Discussion
 ==========
 
@@ -882,19 +706,3 @@ Glossary
     Tenure track - Personnel positions that lead to consideration for tenure. Not on tenure track - Personnel positions that are considered non-tenure earning positions."
 7.  **Full-time or Part-time status:** According to IPEDS, full-time or part-time status are "defined by the institution. The type of appointment at the snapshot date determines whether an employee is full time or part time. The employee's term of contract is not considered in making the determination of full or part time."
 8.  **Medical:** According to IPEDS, "Medical school staff - Staff employed by or employees working in the medical school component of a postsecondary institution or in a free standing medical school. Does not include staff employed by or employees working strictly in a hospital associated with a medical school or those who work in health or allied health schools or departments such as dentistry, veterinary medicine, nursing or dental hygiene."
-
-#### How do benefits like health insurance, vacation time, and pension contributions compare between faculty classes?
-
-``` r
-include_graphics("/Users/chadgevans/Research/Dissertation/Projects/Products/Faculty_Benefits_Over_Time.png")
-```
-
-<img src="/Users/chadgevans/Research/Dissertation/Projects/Products/Faculty_Benefits_Over_Time.png" width="250px" style="display: block; margin: auto;" />
-
-### How exactly have faculty salaries changed over time by tenure status?
-
-``` r
-include_graphics("/Users/chadgevans/Research/Dissertation/Projects/Products/Faculty_SALARY_Over_Time.png")
-```
-
-<img src="/Users/chadgevans/Research/Dissertation/Projects/Products/Faculty_SALARY_Over_Time.png" width="250px" style="display: block; margin: auto;" />
